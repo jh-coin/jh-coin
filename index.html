@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>J-HEDGE | 利用規約（Terms of Service）</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0a0a0a;
+            --text-dim: #333333; /* 読ませる気のない暗い文字 */
+            --text-highlight: #c5a059; /* 金 */
+            --stamp-red: #cc0000; /* ハンコの赤 */
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-dim);
+            font-family: 'Shippori Mincho', serif;
+            margin: 0;
+            padding: 0;
+            overflow: hidden; /* スクロールさせない */
+            height: 100vh;
+            position: relative;
+        }
+
+        /* 背景の規約文章の壁 */
+        #wall-of-text {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            font-size: 0.8rem;
+            line-height: 1.4;
+            word-break: break-all;
+            opacity: 0.5;
+            z-index: 1;
+            padding: 20px;
+            box-sizing: border-box;
+            overflow: hidden;
+            user-select: none; /* 選択不可 */
+            text-align: justify;
+        }
+
+        /* 中央のコンテンツ（浮き出る部分） */
+        .overlay {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 10;
+            text-align: center;
+            background: rgba(0, 0, 0, 0.85); /* 半透明の黒で背景文字を隠す */
+            padding: 3rem 2rem;
+            border: 1px solid var(--text-dim);
+            box-shadow: 0 0 30px rgba(0,0,0,1);
+            max-width: 90%;
+            width: 400px;
+            backdrop-filter: blur(5px);
+        }
+
+        .stamp-box {
+            border: 4px double var(--text-highlight);
+            padding: 20px;
+            position: relative;
+        }
+
+        /* ハンコ風デザイン */
+        .hanko {
+            position: absolute;
+            top: -30px;
+            right: -30px;
+            width: 80px;
+            height: 80px;
+            border: 3px solid var(--stamp-red);
+            border-radius: 50%;
+            color: var(--stamp-red);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 1.2rem;
+            transform: rotate(-15deg);
+            background: rgba(10,10,10, 0.8);
+            box-shadow: 0 0 10px rgba(204, 0, 0, 0.5);
+            animation: stamp-anim 0.5s ease-out backwards;
+            animation-delay: 1s;
+        }
+
+        h1 {
+            color: var(--text-highlight);
+            font-size: 2.5rem;
+            margin: 0 0 1rem 0;
+            letter-spacing: 0.2em;
+        }
+
+        p.warning {
+            color: #fff;
+            font-size: 0.9rem;
+            margin-bottom: 2rem;
+        }
+
+        .btn {
+            background: transparent;
+            color: var(--text-highlight);
+            border: 1px solid var(--text-highlight);
+            padding: 10px 30px;
+            font-family: 'Shippori Mincho', serif;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn:hover {
+            background: var(--text-highlight);
+            color: #000;
+            box-shadow: 0 0 15px var(--text-highlight);
+        }
+
+        /* 墨塗り（ノリ弁）演出 */
+        .redacted {
+            background-color: #000;
+            color: #000;
+            padding: 0 5px;
+            border-radius: 2px;
+        }
+        
+        /* 規約文の中の強調 */
+        .highlight-text {
+            color: #555;
+            font-weight: bold;
+        }
+
+        @keyframes stamp-anim {
+            0% { transform: rotate(-15deg) scale(3); opacity: 0; }
+            100% { transform: rotate(-15deg) scale(1); opacity: 1; }
+        }
+
+        /* モバイル対応 */
+        @media (max-width: 600px) {
+            h1 { font-size: 2rem; }
+            .hanko { width: 60px; height: 60px; font-size: 0.9rem; top: -20px; right: -10px;}
+        }
+    </style>
+</head>
+<body>
+
+    <div id="wall-of-text"></div>
+
+    <div class="overlay">
+        <div class="stamp-box">
+            <div class="hanko">極秘<br>扱イ</div>
+            <h1>J-HEDGE</h1>
+            <p class="warning">
+                下記ノ長大ナル規約ヲ読破シ、<br>
+                日本経済ノ<span class="redacted">崩壊</span>ニ同意スル者ノミ<br>
+                入室ヲ許可ス。
+            </p>
+            <button class="btn" onclick="enterSite()">同意してうぉwと言う</button>
+        </div>
+        <div style="margin-top: 15px; font-size: 0.7rem; color: #555;">
+            ID: JH-XYZ-0001948 // STATUS: LAUGHING
+        </div>
+    </div>
+
+    <script>
+        // 狂気の規約ジェネレーター
+        const textContainer = document.getElementById('wall-of-text');
+        
+        const legalText = `
+        第1条（定義）本規約において「J-HEDGE」とは、絶望を笑いに変換する永久機関を指す。
+        第2条（免責）当方は、日本円（JPY）の価値が紙くずと同等になった場合でも、一切の責任を負わないものとする。むしろそれを推奨する。
+        第3条（通貨の放棄）ユーザーは、本サイトにアクセスした時点で、法定通貨への信頼を一部放棄したものとみなす。
+        第4条（うぉwの精神）損害が発生した際、ユーザーは怒る代わりに「うぉw」と発声しなければならない。これは義務である。
+        第5条（黒塗り）政府見解と異なる事実は、全て自動的に黒塗り（Redacted）処理される。
+        第6条（税金）増税に対する不満は、ブロックチェーンに記録することで昇華される。
+        第7条（退路なし）この同意ボタンを押した後、元の日常には戻れない可能性がある。
+        第8条（無限責任）全ての責任は、投票箱に白票を投じた過去の自分にあるものとする。
+        第9条（柴犬）公式マスコットは可愛いが、噛みつく習性がある。
+        第10条（1946年の預金封鎖）歴史は繰り返す。準備せよ。
+        第11条（カタルシス）我々の目的は資産運用ではなく、集団的カタルシスの獲得にある。
+        第12条（冗談）本プロジェクトの一部は高度な冗談で構成されているが、現実はそれ以上に冗談みたいな状況である。
+        `;
+
+        // 画面いっぱいにテキストを繰り返す
+        let fullText = "";
+        for(let i=0; i<100; i++) {
+            fullText += legalText;
+        }
+        textContainer.innerHTML = fullText;
+
+        // ボタンのアクション
+        function enterSite() {
+            alert("承認されました。\nようこそ、冷笑のシェルターへ。");
+            // 本来はここでメインページへ遷移、今はうぉwを表示
+            console.log("Welcome to J-HEDGE");
+        }
+    </script>
+</body>
+</html>
