@@ -3,194 +3,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>J-HEDGE | ACCESS GRANTED</title>
+    <title>J-HEDGE | STATE OF EMERGENCY</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;800&family=Share+Tech+Mono&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --bg-color: #050505;
-            --gold: #c5a059;
-            --red: #ff3333;
-            --dim: #555;
-        }
+        :root { --bg: #030303; --gold: #c5a059; --red: #ff0000; --dim: #444; }
+        body { margin: 0; background: var(--bg); color: var(--gold); font-family: 'Shippori Mincho', serif; height: 100vh; overflow: hidden; }
+        canvas { position: absolute; top: 0; left: 0; z-index: 0; opacity: 0.2; }
+        .container { position: relative; z-index: 10; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; text-align: center; background: radial-gradient(circle, transparent 0%, rgba(0,0,0,0.9) 100%); padding: 20px; box-sizing: border-box; }
+        
+        .glitch { font-size: 3rem; font-weight: 800; color: var(--gold); position: relative; letter-spacing: 0.2em; margin-bottom: 0.5rem; text-shadow: 2px 2px var(--red); }
+        .glitch::before { content: "J-HEDGE"; position: absolute; left: -2px; text-shadow: -2px 0 blue; clip: rect(44px, 450px, 56px, 0); animation: gl 3s infinite linear alternate-reverse; }
+        @keyframes gl { 0% { clip: rect(10px, 999px, 30px, 0); } 100% { clip: rect(40px, 999px, 80px, 0); } }
 
-        body {
-            margin: 0; padding: 0;
-            background-color: var(--bg-color);
-            color: var(--gold);
-            font-family: 'Shippori Mincho', serif;
-            height: 100vh;
-            overflow: hidden;
-        }
-
-        canvas {
-            display: block; position: absolute; top: 0; left: 0; z-index: 0; opacity: 0.3;
-        }
-
-        .container {
-            position: relative; z-index: 10;
-            display: flex; flex-direction: column;
-            align-items: center; justify-content: center;
-            height: 100%; text-align: center;
-            background: radial-gradient(circle, rgba(0,0,0,0) 0%, rgba(0,0,0,0.9) 100%);
-            padding: 20px; box-sizing: border-box;
-        }
-
-        /* グリッチタイトル */
-        .glitch-wrapper { position: relative; margin-bottom: 1rem; }
-        h1 {
-            font-size: 3rem; margin: 0; color: var(--gold); position: relative; letter-spacing: 0.1em;
-        }
-        h1::before, h1::after {
-            content: attr(data-text); position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-color);
-        }
-        h1::before {
-            left: 2px; text-shadow: -1px 0 #ff00c1; clip: rect(44px, 450px, 56px, 0); animation: glitch-anim 5s infinite linear alternate-reverse;
-        }
-        h1::after {
-            left: -2px; text-shadow: -1px 0 #00fff9; clip: rect(44px, 450px, 56px, 0); animation: glitch-anim2 5s infinite linear alternate-reverse;
-        }
-        @keyframes glitch-anim { 0% { clip: rect(30px, 9999px, 10px, 0); } 100% { clip: rect(10px, 9999px, 100px, 0); } }
-        @keyframes glitch-anim2 { 0% { clip: rect(10px, 9999px, 50px, 0); } 100% { clip: rect(60px, 9999px, 80px, 0); } }
-
-        /* 免責事項ボックス */
         .disclaimer-box {
-            width: 90%; max-width: 500px; height: 200px; overflow-y: scroll;
-            background: rgba(0,0,0,0.85); border: 1px solid var(--red);
-            padding: 15px; text-align: left; font-size: 0.85rem; color: #ccc;
-            margin-bottom: 20px; box-shadow: 0 0 15px rgba(255, 50, 50, 0.2);
-            -webkit-overflow-scrolling: touch; /* iOS用スムーズスクロール */
+            width: 100%; max-width: 600px; height: 350px; overflow-y: scroll;
+            background: rgba(10,10,10,0.95); border: 2px solid var(--red);
+            padding: 20px; text-align: left; font-size: 0.75rem; color: #888;
+            margin: 20px 0; line-height: 1.8; position: relative;
+            scrollbar-width: thin; scrollbar-color: var(--red) #000;
         }
-        .disclaimer-title { color: var(--red); text-align: center; font-weight: bold; margin-bottom: 10px; }
+        .disclaimer-box p { margin: 15px 0; border-bottom: 1px solid #222; padding-bottom: 5px; }
+        .important { color: var(--red); font-weight: bold; }
 
-        /* ボタン */
         .btn {
             background: transparent; color: var(--dim); border: 2px solid var(--dim);
-            padding: 15px 30px; font-size: 1rem; cursor: not-allowed;
-            font-family: 'Share Tech Mono', monospace; transition: 0.3s;
-            pointer-events: none;
+            padding: 18px 40px; font-size: 1.1rem; cursor: not-allowed;
+            font-family: 'Share Tech Mono', monospace; transition: 0.5s; pointer-events: none;
         }
-        .btn.enabled {
-            border-color: var(--gold); color: var(--gold); cursor: pointer;
-            pointer-events: auto; background: rgba(197, 160, 89, 0.1);
-        }
-        .btn.enabled:hover { background: var(--gold); color: #000; box-shadow: 0 0 30px var(--gold); }
+        .btn.enabled { border-color: var(--gold); color: var(--gold); cursor: pointer; pointer-events: auto; background: rgba(197, 160, 89, 0.1); box-shadow: 0 0 20px rgba(197, 160, 89, 0.3); }
+        .btn.enabled:hover { background: var(--gold); color: #000; }
 
-        /* ログ画面 */
-        #console-log {
-            display: none; position: fixed; bottom: 0; left: 0; width: 100%; height: 100vh;
-            background: rgba(0, 0, 0, 0.98); color: #0f0;
-            font-family: 'Share Tech Mono', monospace; font-size: 0.9rem; padding: 20px;
-            box-sizing: border-box; text-align: left; z-index: 100; overflow: hidden;
-        }
-        
-        /* 最終画面 */
-        #success-screen {
-            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: #000; z-index: 200; flex-direction: column; align-items: center; justify-content: center;
-        }
-        .link-btn {
-            display: block; width: 250px; padding: 15px; margin: 10px;
-            text-decoration: none; font-family: 'Share Tech Mono', monospace;
-            font-size: 1.1rem; text-align: center; border: 2px solid; transition: 0.3s;
-        }
-        .pump-btn { border-color: #16c784; color: #16c784; }
-        .x-btn { border-color: #fff; color: #fff; }
-    </style>
-</head>
-<body>
-
-    <canvas id="matrix"></canvas>
-
-    <div class="container" id="main-container">
-        <div class="glitch-wrapper"><h1 data-text="J-HEDGE">J-HEDGE</h1></div>
-        <p style="font-size: 0.8rem;">[SYSTEM LOCK ACTIVE]</p>
-        
-        <div id="disclaimer-box" class="disclaimer-box">
-            <div class="disclaimer-title">【魂の譲渡契約書】</div>
-            <p>ここに書かれていることは、すべて現実となります。</p>
-            <p>1. あなたの全財産をJH-COINに替える準備はできていますか？</p>
-            <p>2. 一度ボタンを押せば、もう引き返せません。</p>
-            <p>3. 利益はあなたのもの、損失は運命です。</p>
-            <p>4. 運営を信じる者は救われるかもしれません。</p>
-            <p>5. この契約は、デバイスを破壊するまで有効です。</p>
-            <p>...... スクロールを継続せよ ......</p>
-            <p>...... スクロールを継続せよ ......</p>
-            <p>...... スクロールを継続せよ ......</p>
-            <p>承認コード：JH-777-PUMP</p>
-            <p style="text-align:center; color:var(--red); font-weight:bold; margin-top:50px;">[ スクロール完了：アクセスを承認します ]</p>
-        </div>
-
-        <button id="hack-btn" class="btn">[ SCROLL TO UNLOCK ]</button>
-    </div>
-
-    <div id="console-log"></div>
-
-    <div id="success-screen">
-        <h2 style="color:var(--gold); font-family:'Share Tech Mono';">ACCESS GRANTED</h2>
-        <a href="https://pump.fun/board" target="_blank" class="link-btn pump-btn">BUY ON PUMP.FUN</a>
-        <a href="https://x.com" target="_blank" class="link-btn x-btn">FOLLOW ON X</a>
-    </div>
-
-    <script>
-        // Matrix
-        const canvas = document.getElementById('matrix');
-        const ctx = canvas.getContext('2d');
-        canvas.width = window.innerWidth; canvas.height = window.innerHeight;
-        const katakana = 'J-HEDGE01';
-        const fontSize = 16; const columns = canvas.width/fontSize;
-        const rainDrops = []; for(let x=0; x<columns; x++) rainDrops[x] = 1;
-        function draw() {
-            ctx.fillStyle = 'rgba(0, 0, 0, 0.05)'; ctx.fillRect(0, 0, canvas.width, canvas.height);
-            ctx.fillStyle = '#c5a059'; ctx.font = fontSize + 'px monospace';
-            for(let i=0; i<rainDrops.length; i++){
-                const text = katakana.charAt(Math.floor(Math.random() * katakana.length));
-                ctx.fillText(text, i*fontSize, rainDrops[i]*fontSize);
-                if(rainDrops[i]*fontSize > canvas.height && Math.random() > 0.975) rainDrops[i] = 0;
-                rainDrops[i]++;
-            }
-        }
-        setInterval(draw, 30);
-
-        // ★修正ポイント：スクロール判定を「遊び」を持たせる
-        const box = document.getElementById('disclaimer-box');
-        const btn = document.getElementById('hack-btn');
-
-        box.addEventListener('scroll', () => {
-            // 全体の高さの80%以上スクロールしたら解禁
-            const scrollPercent = (box.scrollTop + box.clientHeight) / box.scrollHeight;
-            if(scrollPercent > 0.9) { 
-                btn.classList.add('enabled');
-                btn.innerHTML = "INITIALIZE_PROTOCOL";
-                btn.style.pointerEvents = "auto"; 
-            }
-        });
-
-        // ボタンクリック
-        btn.onclick = () => {
-            if(!btn.classList.contains('enabled')) return;
-            document.getElementById('main-container').style.display = 'none';
-            const log = document.getElementById('console-log');
-            log.style.display = 'block';
-            
-            const messages = ["Connecting...", "Bypassing Firewall...", "Soul Verified.", "Success."];
-            let i = 0;
-            const timer = setInterval(() => {
-                if(i >= messages.length) {
-                    clearInterval(timer);
-                    setTimeout(() => {
-                        log.style.display = 'none';
-                        document.getElementById('success-screen').style.display = 'flex';
-                    }, 1000);
-                    return;
-                }
-                const p = document.createElement('div');
-                p.innerHTML = "> " + messages[i];
-                log.appendChild(p);
-                i++;
-            }, 500);
-        };
-    </script>
-</body>
-</html>
+        #console-log { display: none; position: fixed; inset: 0; background: #000; color: #0f0; padding: 30px; font-family: monospace; z-index: 1000
