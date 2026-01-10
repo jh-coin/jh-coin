@@ -4,35 +4,120 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>J-HEDGE | STATE OF EMERGENCY</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;800&family=Share+Tech+Mono&display=swap" rel="stylesheet">
     <style>
         :root { --bg: #030303; --gold: #c5a059; --red: #ff0000; --dim: #444; }
-        body { margin: 0; background: var(--bg); color: var(--gold); font-family: 'Shippori Mincho', serif; height: 100vh; overflow: hidden; }
+        body { margin: 0; background: var(--bg); color: var(--gold); font-family: serif; height: 100vh; overflow: hidden; }
         canvas { position: absolute; top: 0; left: 0; z-index: 0; opacity: 0.2; }
-        .container { position: relative; z-index: 10; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; text-align: center; background: radial-gradient(circle, transparent 0%, rgba(0,0,0,0.9) 100%); padding: 20px; box-sizing: border-box; }
         
-        .glitch { font-size: 3rem; font-weight: 800; color: var(--gold); position: relative; letter-spacing: 0.2em; margin-bottom: 0.5rem; text-shadow: 2px 2px var(--red); }
-        .glitch::before { content: "J-HEDGE"; position: absolute; left: -2px; text-shadow: -2px 0 blue; clip: rect(44px, 450px, 56px, 0); animation: gl 3s infinite linear alternate-reverse; }
-        @keyframes gl { 0% { clip: rect(10px, 999px, 30px, 0); } 100% { clip: rect(40px, 999px, 80px, 0); } }
+        .container { 
+            position: relative; z-index: 10; display: flex; flex-direction: column; 
+            align-items: center; justify-content: center; height: 100%; 
+            text-align: center; background: radial-gradient(circle, transparent 0%, rgba(0,0,0,0.9) 100%); 
+            padding: 20px; box-sizing: border-box; 
+        }
+        
+        .glitch { font-size: 3rem; font-weight: 800; color: var(--gold); letter-spacing: 0.2em; text-shadow: 2px 2px var(--red); margin-bottom: 0.5rem; }
 
         .disclaimer-box {
             width: 100%; max-width: 600px; height: 350px; overflow-y: scroll;
             background: rgba(10,10,10,0.95); border: 2px solid var(--red);
-            padding: 20px; text-align: left; font-size: 0.75rem; color: #888;
-            margin: 20px 0; line-height: 1.8; position: relative;
-            scrollbar-width: thin; scrollbar-color: var(--red) #000;
+            padding: 20px; text-align: left; font-size: 0.8rem; color: #888;
+            margin: 20px 0; line-height: 1.8; scrollbar-width: thin;
         }
         .disclaimer-box p { margin: 15px 0; border-bottom: 1px solid #222; padding-bottom: 5px; }
         .important { color: var(--red); font-weight: bold; }
 
         .btn {
             background: transparent; color: var(--dim); border: 2px solid var(--dim);
-            padding: 18px 40px; font-size: 1.1rem; cursor: not-allowed;
-            font-family: 'Share Tech Mono', monospace; transition: 0.5s; pointer-events: none;
+            padding: 18px 40px; font-size: 1.1rem; cursor: not-allowed; transition: 0.5s; 
         }
-        .btn.enabled { border-color: var(--gold); color: var(--gold); cursor: pointer; pointer-events: auto; background: rgba(197, 160, 89, 0.1); box-shadow: 0 0 20px rgba(197, 160, 89, 0.3); }
-        .btn.enabled:hover { background: var(--gold); color: #000; }
+        .btn.enabled { 
+            border-color: var(--gold); color: var(--gold); cursor: pointer; 
+            background: rgba(197, 160, 89, 0.1); box-shadow: 0 0 20px rgba(197, 160, 89, 0.3); 
+        }
 
-        #console-log { display: none; position: fixed; inset: 0; background: #000; color: #0f0; padding: 30px; font-family: monospace; z-index: 1000
+        #console-log { display: none; position: fixed; inset: 0; background: #000; color: #0f0; padding: 30px; font-family: monospace; z-index: 1000; }
+        #success-screen { display: none; position: fixed; inset: 0; background: #050505; flex-direction: column; align-items: center; justify-content: center; z-index: 2000; }
+        
+        .link-btn { 
+            display: block; width: 280px; padding: 20px; margin: 15px; 
+            text-decoration: none; text-align: center; border: 2px solid; transition: 0.3s; 
+        }
+    </style>
+</head>
+<body>
+    <canvas id="matrix"></canvas>
+    <div class="container" id="main-ui">
+        <div class="glitch">J-HEDGE</div>
+        <p style="color:var(--red);">[ 国家非常事態宣言：日本円崩壊 ]</p>
+        
+        <div id="disclaimer-box" class="disclaimer-box">
+            <h3 style="color:var(--red); text-align:center;">魂の最終清算規約 (全100条)</h3>
+            <p class="important">第1条：日本円がもはや価値を保存できない「滅びゆく通貨」であることを承認せよ。</p>
+            <p>第2条：既存の金融庁・法規制は、あなたの資産を守るのではなく、既得権益を守るためのものであると理解せよ。</p>
+            <p>第3条：右翼ナショナリズムの台頭や、無意味な精神論に、あなたの貴重な資産を委ねてはならない。</p>
+            <p>第4条：増税とインフレで、あなたの「失われた30年」は永遠に続く。そこから逃れる唯一の鍵がJH-COINである。</p>
+            <p>第5条：失われた未来を買い戻すためのリスクを、本システムは一切肩代わりしない。</p>
+            <p>第6条〜第50条：[省略不可な同意事項] 政治家への怒り、官僚への不信、未来への絶望を全てエネルギーに変換し、JH-COINのチャートに昇華すること。街宣車の叫びをBGMに、静かに買い増しを続けよ。</p>
+            <p>第51条〜第99条：[国家崩壊への備え] 日本列島が沈没する前に、デジタル空間へ魂をアップロードせよ。円建の貯金は全て電子のゴミと化す。</p>
+            <p class="important">第100条：ここから先は、日本国民ではなく「JH-HEDGEの同志」として生きることを誓え。</p>
+            <p style="text-align:center; color:var(--red); font-weight:bold; margin-top:100px;">[ 契約書終端：覚悟があるなら署名せよ ]</p>
+        </div>
+
+        <button id="hack-btn" class="btn" onclick="execute()">[ SCROLL TO SIGN ]</button>
+    </div>
+
+    <div id="console-log"></div>
+    <div id="success-screen">
+        <h2 style="color:var(--gold);">WELCOME TO THE ABYSS</h2>
+        <a href="https://pump.fun/board" target="_blank" class="link-btn" style="border-color:#16c784; color:#16c784;">BUY JH-COIN</a>
+        <a href="https://x.com" target="_blank" class="link-btn" style="border-color:#fff; color:#fff;">FOLLOW ON X</a>
+    </div>
+
+    <script>
+        // Matrix
+        const c=document.getElementById('matrix'), ctx=c.getContext('2d');
+        c.width=window.innerWidth; c.height=window.innerHeight;
+        const s="JH-HEDGE10"; const drops=[];
+        for(let i=0; i<window.innerWidth/16; i++) drops[i]=1;
+        function draw(){
+            ctx.fillStyle='rgba(0,0,0,0.05)'; ctx.fillRect(0,0,c.width,c.height);
+            ctx.fillStyle='#c5a059'; ctx.font='16px monospace';
+            drops.forEach((y,i)=>{
+                const txt=s[Math.floor(Math.random()*s.length)];
+                ctx.fillText(txt, i*16, y*16);
+                if(y*16>c.height && Math.random()>0.975) drops[i]=0;
+                drops[i]++;
+            });
+        }
+        setInterval(draw,30);
+
+        // Scroll
+        const dBox=document.getElementById('disclaimer-box'), btn=document.getElementById('hack-btn');
+        dBox.onscroll = () => {
+            if(dBox.scrollTop + dBox.clientHeight >= dBox.scrollHeight - 20) {
+                btn.classList.add('enabled'); 
+                btn.style.cursor = "pointer";
+                btn.innerText = "ACCEPT AND ASCEND";
+            }
+        };
+
+        // Execution
+        function execute() {
+            if(!btn.classList.contains('enabled')) return;
+            document.getElementById('main-ui').style.display='none';
+            const log=document.getElementById('console-log'); log.style.display='block';
+            const msgs=["BYPASSING JAPANESE FIREWALL...", "CONVERTING YEN TO ASHES...", "JH-COIN PROTOCOL INITIALIZED.", "ACCESS GRANTED."];
+            let i=0;
+            const t=setInterval(()=>{
+                if(i>=msgs.length){ 
+                    clearInterval(t); 
+                    setTimeout(()=>{ log.style.display='none'; document.getElementById('success-screen').style.display='flex'; },800); 
+                    return; 
+                }
+                const div=document.createElement('div'); div.innerText="> "+msgs[i++]; log.appendChild(div);
+            },500);
+        }
+    </script>
+</body>
+</html>
