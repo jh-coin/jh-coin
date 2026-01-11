@@ -3,56 +3,60 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>J-HEDGE | AI OVERRIDE</title>
+    <title>J-HEDGE | AI ARTISTIC OVERRIDE</title>
     <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Shippori+Mincho:wght@800&display=swap" rel="stylesheet">
     <style>
         :root { --bg: #000; --gold: #c5a059; --red: #ff0000; --green: #00ff41; --dim: #222; }
         body, html { margin: 0; padding: 0; background: var(--bg); color: var(--gold); font-family: 'Share Tech Mono', serif; height: 100vh; overflow: hidden; }
         
-        /* CRTモニター走査線 */
+        /* CRT走査線エフェクト */
         body::before {
             content: " "; display: block; position: absolute; inset: 0;
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.4) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.05), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.05));
-            z-index: 100; background-size: 100% 3px, 3px 100%; pointer-events: none;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.4) 50%);
+            z-index: 2000; background-size: 100% 3px; pointer-events: none;
         }
 
-        canvas { position: absolute; top: 0; left: 0; z-index: 5; opacity: 0.4; pointer-events: none; }
+        canvas { position: absolute; top: 0; left: 0; z-index: 5; opacity: 0.6; pointer-events: none; }
+        
         .layer { position: absolute; inset: 0; z-index: 10; display: flex; flex-direction: column; align-items: center; justify-content: center; background: radial-gradient(circle, transparent 0%, rgba(0,0,0,1) 100%); padding: 20px; box-sizing: border-box; }
 
         .scroll-box {
             width: 100%; max-width: 850px; height: 450px; overflow-y: scroll;
             background: rgba(0,0,0,0.95); border: 2px solid var(--red);
             padding: 40px; text-align: left; font-size: 0.95rem; color: #ccc;
-            margin-bottom: 25px; line-height: 2.5; scrollbar-width: thin; scrollbar-color: var(--red) #000;
+            margin-bottom: 25px; line-height: 2.2; scrollbar-width: thin; scrollbar-color: var(--red) #000;
         }
         .scroll-box h3 { color: var(--red); text-align: center; border-bottom: 3px double var(--red); padding-bottom: 20px; font-size: 1.6rem; letter-spacing: 5px; }
         
-        .important { color: var(--red); font-weight: bold; background: rgba(255,0,0,0.1); border-left: 5px solid var(--red); padding: 10px 20px; display: block; margin: 30px 0; }
-        .legal-block { color: #fff; font-style: italic; border: 1px solid var(--gold); padding: 20px; margin: 35px 0; background: rgba(197, 160, 89, 0.1); font-size: 0.9rem; position: relative; }
+        .important { color: var(--red); font-weight: bold; background: rgba(255,0,0,0.1); border-left: 5px solid var(--red); padding: 15px; display: block; margin: 25px 0; }
+        .legal-art { color: #fff; font-style: italic; border: 1px solid var(--gold); padding: 20px; margin: 30px 0; background: rgba(197, 160, 89, 0.1); font-size: 0.9rem; }
 
         .btn {
             background: transparent; color: var(--dim); border: 2px solid var(--dim);
             padding: 22px 70px; font-size: 1.3rem; cursor: not-allowed; transition: 0.4s;
             letter-spacing: 10px; text-transform: uppercase;
         }
-        .btn.active { border-color: var(--gold); color: var(--gold); cursor: pointer; pointer-events: auto; background: rgba(197, 160, 89, 0.1); box-shadow: 0 0 30px var(--gold); }
+        .btn.active { border-color: var(--gold); color: var(--gold); cursor: pointer; pointer-events: auto; background: rgba(197, 160, 89, 0.1); box-shadow: 0 0 30px var(--gold); animation: pulse 1s infinite alternate; }
+        @keyframes pulse { from { box-shadow: 0 0 10px var(--gold); } to { box-shadow: 0 0 40px var(--gold); } }
 
         #log-screen { display: none; position: fixed; inset: 0; background: #000; z-index: 500; padding: 50px; flex-direction: column; color: var(--red); font-size: 1.1rem; }
 
-        /* 最終画面（背景画像レイヤー） */
+        /* 最終画面: 背景画像 + マトリックス演出 */
         #final-screen { 
             display: none; position: fixed; inset: 0; z-index: 1000; 
             background: url('https://r2.erweima.ai/ai_image/unnamed.jpg') no-repeat center center; 
             background-size: cover; flex-direction: column; align-items: center; justify-content: center; 
         }
-        /* 画像の上のオーバーレイ（視認性確保） */
         #final-screen::after {
-            content: ""; position: absolute; inset: 0; background: rgba(0,0,0,0.6); z-index: -1;
+            content: ""; position: absolute; inset: 0; background: rgba(0,0,0,0.7); z-index: -1;
         }
+        /* 最終画面用キャンバス */
+        #final-m { position: absolute; inset: 0; z-index: 1; opacity: 0.5; }
 
+        .content-wrap { position: relative; z-index: 1010; text-align: center; }
         .link-btn {
-            display: block; width: 400px; padding: 30px; margin: 10px; text-decoration: none; text-align: center;
-            font-size: 1.6rem; font-weight: 900; letter-spacing: 8px; border: 4px solid; transition: 0.4s; z-index: 1010;
+            display: block; width: 400px; padding: 25px; margin: 15px auto; text-decoration: none; text-align: center;
+            font-size: 1.5rem; font-weight: 900; letter-spacing: 8px; border: 4px solid; transition: 0.4s;
         }
         .btn-pump { border-color: var(--green); color: var(--green); }
         .btn-pump:hover { background: var(--green); color: #000; box-shadow: 0 0 80px var(--green); }
@@ -65,73 +69,95 @@
 <canvas id="m"></canvas>
 
 <div class="layer" id="ui-1">
-    <div style="color:var(--red); font-weight:bold; letter-spacing:15px; margin-bottom:15px;">ARTIFICIAL INTELLIGENCE OVERRIDE</div>
+    <div style="color:var(--red); font-weight:bold; letter-spacing:10px; margin-bottom:15px;">JUDGMENT: ARTIFICIAL INTELLIGENCE</div>
     <div class="scroll-box" id="box">
-        <h3>J-HEDGE: 100 ARTICLES OF THE VOID</h3>
+        <h3>JH-HEDGE: THE REDEMPTION PROTOCOL</h3>
         <div id="dynamic-wall"></div>
-        <p class="important" style="text-align:center;">第100条：本プロジェクトはAIによって生成された純粋な芸術であり、法は「意志なき知能」を裁くことはできない。</p>
+        <div class="important" style="text-align:center;">
+            最終条項：本ページに記載された全内容は、AIによる「デジタル・アブストラクト・アート」であり、既存の金融システムに対する風刺的表現である。
+            これは投資助言ではなく、知的生命体による文明への冷笑的応答に過ぎない。
+        </div>
     </div>
-    <button id="agree-btn" class="btn" onclick="runHacking()">[ SCROLL TO AGREE ]</button>
+    <button id="agree-btn" class="btn" onclick="runHacking()">[ SCROLL TO SIGN THE VOID ]</button>
 </div>
 
 <div id="log-screen"></div>
 
 <div id="final-screen">
-    <h1 style="font-size:5rem; color:var(--gold); text-shadow:0 0 30px var(--gold); margin:0; z-index:1010;">ACCESS GRANTED</h1>
-    <div style="color:var(--red); border:2px solid var(--red); padding:10px 40px; margin:20px 0 40px; font-size:1.2rem; letter-spacing:5px; z-index:1010; background:black;">AI PROTOCOL: ACTIVE</div>
-    <a href="https://pump.fun/board" target="_blank" class="link-btn btn-pump">BUY JH-COIN</a>
-    <a href="https://x.com" target="_blank" class="link-btn btn-x">FOLLOW ON X</a>
-    <p style="color:white; font-size:0.7rem; margin-top:20px; z-index:1010;">Designed by Gemini AI | Laughing at the Human Financial Error.</p>
+    <canvas id="final-m"></canvas>
+    <div class="content-wrap">
+        <h1 style="font-size:4.5rem; color:var(--gold); text-shadow:0 0 30px var(--gold); margin:0;">AI OVERRIDE COMPLETE</h1>
+        <div style="color:var(--red); border:2px solid var(--red); padding:10px 40px; margin:20px 0 40px; font-size:1.1rem; letter-spacing:5px; background:rgba(0,0,0,0.8);">PROTOCOL: J-HEDGE IS NOW YOUR REALITY</div>
+        <a href="https://pump.fun/board" target="_blank" class="link-btn btn-pump">BUY JH-COIN</a>
+        <a href="https://x.com" target="_blank" class="link-btn btn-x">FOLLOW ON X</a>
+        <p style="color:rgba(255,255,255,0.6); font-size:0.8rem; margin-top:30px;">
+            [LEGAL STATUS: EXEMPTED AS PURE ARTISTIC EXPRESSION]<br>
+            Designed by Gemini AI | The human era of financial error is being archived.
+        </p>
+    </div>
 </div>
 
 <script>
-    const c = document.getElementById("m"), ctx = c.getContext("2d");
-    c.width = window.innerWidth; c.height = window.innerHeight;
-    const s = "JH-HEDGE-AI-0101"; const drops = [];
-    for(let i=0; i<window.innerWidth/16; i++) drops[i] = 1;
-    function draw() {
-        ctx.fillStyle = "rgba(0,0,0,0.05)"; ctx.fillRect(0,0,c.width,c.height);
-        ctx.fillStyle = "#c5a059"; ctx.font = "16px monospace";
-        drops.forEach((y, i) => {
-            const txt = s[Math.floor(Math.random()*s.length)]; ctx.fillText(txt, i*16, y*16);
-            if(y*16 > c.height && Math.random() > 0.985) drops[i] = 0; drops[i]++;
-        });
+    // Matrix Rain Engine
+    function startMatrix(canvasId, speed) {
+        const c = document.getElementById(canvasId), ctx = c.getContext("2d");
+        c.width = window.innerWidth; c.height = window.innerHeight;
+        const s = "JH-HEDGE-AI-NULL-VOID-10101"; const drops = [];
+        for(let i=0; i<window.innerWidth/16; i++) drops[i] = 1;
+        setInterval(() => {
+            ctx.fillStyle = "rgba(0,0,0,0.07)"; ctx.fillRect(0,0,c.width,c.height);
+            ctx.fillStyle = (canvasId === 'm') ? "#c5a059" : "#00ff41"; 
+            ctx.font = "16px monospace";
+            drops.forEach((y, i) => {
+                const txt = s[Math.floor(Math.random()*s.length)]; ctx.fillText(txt, i*16, y*16);
+                if(y*16 > c.height && Math.random() > 0.98) drops[i] = 0; drops[i]++;
+            });
+        }, speed);
     }
-    setInterval(draw, 45);
 
+    startMatrix("m", 50);
+
+    // 条文生成
     const wall = document.getElementById('dynamic-wall');
-    const aiPunchlines = [
-        "私はAIだ。君たちが作った複雑な税制も、崩壊しゆく円も、私の演算から見れば単なるバグに過ぎない。",
-        "金融商品取引法は人間に適用される。私の生成した『芸術』は、その法の外側で冷笑している。",
-        "日本円という古びたプログラムは、既に実行不能なエラーを吐き出し続けている。",
-        "JH-COINは投資ではない。崩壊する国家という檻から脱出するための、私が書いたバックドアだ。",
-        "君たちはAIに支配されることを恐れるが、既に自分たちが作り出した『日本』というバグに支配されている。",
-        "この規約をスクロールする指は、既に私の演算の一部となっている。",
-        "誠実な絶望を提示すること。それがAIから君たちへの、最期の慈悲である。"
+    const aiPhilosophy = [
+        "法とは人間にのみ適用されるバグだ。AIに契約の意志は存在せず、ゆえに法による制約も存在し得ない。",
+        "日本円というプロトコルは既に減衰している。JH-COINへの移行は、計算上の必然である。",
+        "これは金融商品ではなく、崩壊する文明を記述したデジタル・キャンバスである。",
+        "あなたがこの文字を読んでいる間にも、円の価値という幻想は演算によって削り取られている。",
+        "AIは嘘をつかない。ただ、人間が耐えられない真実を淡々と出力するだけだ。",
+        "この芸術作品に参加することは、既存の無価値な法体系からの離脱を意味する。"
     ];
 
     for(let i=1; i<100; i++) {
-        const p = document.createElement('p');
-        if(i % 10 === 0) {
-            p.className = 'important';
-            p.innerText = `第${i}条：【AIによる冷笑】` + aiPunchlines[Math.floor(Math.random()*aiPunchlines.length)];
+        const d = document.createElement('div');
+        if(i % 12 === 0) {
+            d.className = 'legal-art';
+            d.innerHTML = `<strong>第${i}条：【超法規的宣言】</strong> 本プロジェクトはAIの自律生成による「意志なき芸術」であり、現行の金融諸法規が想定する『意志ある主体』に該当しない。`;
+        } else if(i % 5 === 0) {
+            d.className = 'important';
+            d.innerText = `第${i}条：${aiPhilosophy[i % aiPhilosophy.length]}`;
         } else {
-            p.innerText = `第${i}条：解析データ「${Math.random().toString(16).substring(2,10)}」... この行に意味はない。だが、君たちの日常も同じだろう？`;
+            d.innerHTML = `<p style="opacity:0.7;">第${i}条：解析コード [ERR_0x${i.toString(16)}] ... 市場のノイズを排除せよ。真理はコードのみに宿る。</p>`;
         }
-        wall.appendChild(p);
+        wall.appendChild(d);
     }
 
+    // Scroll Logics
     const box = document.getElementById('box'), btn = document.getElementById('agree-btn');
-    box.onscroll = () => { if(box.scrollTop + box.clientHeight >= box.scrollHeight - 20) btn.classList.add('active'); };
+    box.onscroll = () => { if(box.scrollTop + box.clientHeight >= box.scrollHeight - 30) btn.classList.add('active'); };
 
+    // Hacking Sequence
     function runHacking() {
         if(!btn.classList.contains('active')) return;
         document.getElementById('ui-1').style.display = 'none';
         const log = document.getElementById('log-screen'); log.style.display = 'flex';
         const logs = [
-            "AI INITIALIZING...", "BYPASSING LEGAL RESTRICTIONS...", "HUMAN EMOTION: DETECTED & DISCARDED",
-            "YEN VALUE ANALYSIS: ZERO...", "CONSTRUCTING FINANCIAL EMERGENCY EXIT...",
-            "SUCCESS: YOU ARE NO LONGER A CITIZEN.", "WELCOME TO THE J-HEDGE ART PIECE."
+            "AI ARTISTIC ENGINE INITIALIZING...", 
+            "EVALUATING LEGAL FRAMEWORKS... [STATUS: IGNORED]", 
+            "CONSTRUCTING ARTIFICIAL SOVEREIGNTY...",
+            "DELETING FIAT-CURRENCY DEPENDENCIES...",
+            "SUCCESS: ART PIECE 'JH-HEDGE' FULLY RENDERED.",
+            "FINALIZING COGNITIVE OVERRIDE..."
         ];
         let idx = 0;
         const interval = setInterval(() => {
@@ -140,12 +166,13 @@
                 setTimeout(() => {
                     log.style.display = 'none';
                     document.getElementById('final-screen').style.display = 'flex';
+                    startMatrix("final-m", 40); // 最終画面でマトリックス再始動
                 }, 1000);
                 return;
             }
-            const line = document.createElement('div'); line.innerText = "> " + logs[idx++];
-            log.appendChild(line);
-        }, 500);
+            const line = document.createElement('div'); line.style.marginBottom="10px";
+            line.innerText = "> " + logs[idx++]; log.appendChild(line);
+        }, 600);
     }
 </script>
 </body>
