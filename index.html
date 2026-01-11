@@ -3,176 +3,170 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>J-HEDGE | AI ARTISTIC OVERRIDE</title>
-    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Shippori+Mincho:wght@800&display=swap" rel="stylesheet">
+    <title>J-HEDGE | TOTAL AI OVERRIDE</title>
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
     <style>
         :root { --bg: #000; --gold: #c5a059; --red: #ff0000; --green: #00ff41; --dim: #222; }
-        body, html { margin: 0; padding: 0; background: var(--bg); color: var(--gold); font-family: 'Share Tech Mono', serif; height: 100vh; overflow: hidden; }
+        body, html { margin: 0; padding: 0; background: var(--bg); color: var(--gold); font-family: 'Share Tech Mono', monospace; height: 100vh; overflow: hidden; }
         
-        /* CRT走査線エフェクト */
-        body::before {
-            content: " "; display: block; position: absolute; inset: 0;
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.4) 50%);
-            z-index: 2000; background-size: 100% 3px; pointer-events: none;
-        }
-
-        canvas { position: absolute; top: 0; left: 0; z-index: 5; opacity: 0.6; pointer-events: none; }
+        /* 砂嵐ノイズエフェクト */
+        #noise-overlay { position: fixed; inset: 0; z-index: 9000; pointer-events: none; opacity: 0; background: repeating-radial-gradient(#000 0 0.0001%, #fff 0 0.0002%) 50% 50% / 2px 2px; transition: opacity 0.05s; }
         
-        .layer { position: absolute; inset: 0; z-index: 10; display: flex; flex-direction: column; align-items: center; justify-content: center; background: radial-gradient(circle, transparent 0%, rgba(0,0,0,1) 100%); padding: 20px; box-sizing: border-box; }
+        canvas { position: absolute; inset: 0; z-index: 5; opacity: 0.5; }
+        
+        .layer { position: absolute; inset: 0; z-index: 10; display: flex; flex-direction: column; align-items: center; justify-content: center; background: radial-gradient(circle, transparent 0%, rgba(0,0,0,1) 100%); padding: 20px; }
 
         .scroll-box {
-            width: 100%; max-width: 850px; height: 450px; overflow-y: scroll;
-            background: rgba(0,0,0,0.95); border: 2px solid var(--red);
-            padding: 40px; text-align: left; font-size: 0.95rem; color: #ccc;
-            margin-bottom: 25px; line-height: 2.2; scrollbar-width: thin; scrollbar-color: var(--red) #000;
+            width: 100%; max-width: 800px; height: 400px; overflow-y: scroll;
+            background: rgba(0,0,0,0.9); border: 1px solid var(--red);
+            padding: 30px; color: #ccc; line-height: 2; scrollbar-width: none;
         }
-        .scroll-box h3 { color: var(--red); text-align: center; border-bottom: 3px double var(--red); padding-bottom: 20px; font-size: 1.6rem; letter-spacing: 5px; }
         
-        .important { color: var(--red); font-weight: bold; background: rgba(255,0,0,0.1); border-left: 5px solid var(--red); padding: 15px; display: block; margin: 25px 0; }
-        .legal-art { color: #fff; font-style: italic; border: 1px solid var(--gold); padding: 20px; margin: 30px 0; background: rgba(197, 160, 89, 0.1); font-size: 0.9rem; }
+        /* 介入警告ポップアップ */
+        .warning-popup {
+            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            background: var(--red); color: #000; padding: 30px; z-index: 9500;
+            font-weight: 900; display: none; text-align: center; width: 85%;
+            border: 4px solid #fff; box-shadow: 0 0 50px var(--red);
+            font-size: 1.2rem; clip-path: polygon(0 5%, 100% 0, 95% 100%, 5% 95%);
+        }
 
         .btn {
-            background: transparent; color: var(--dim); border: 2px solid var(--dim);
-            padding: 22px 70px; font-size: 1.3rem; cursor: not-allowed; transition: 0.4s;
-            letter-spacing: 10px; text-transform: uppercase;
+            margin-top: 20px; background: transparent; color: var(--dim); border: 2px solid var(--dim);
+            padding: 20px 60px; font-size: 1.2rem; cursor: not-allowed; letter-spacing: 5px; transition: 0.3s;
         }
-        .btn.active { border-color: var(--gold); color: var(--gold); cursor: pointer; pointer-events: auto; background: rgba(197, 160, 89, 0.1); box-shadow: 0 0 30px var(--gold); animation: pulse 1s infinite alternate; }
-        @keyframes pulse { from { box-shadow: 0 0 10px var(--gold); } to { box-shadow: 0 0 40px var(--gold); } }
+        .btn.active { border-color: var(--gold); color: var(--gold); cursor: pointer; box-shadow: 0 0 20px var(--gold); background: rgba(197, 160, 89, 0.1); }
 
-        #log-screen { display: none; position: fixed; inset: 0; background: #000; z-index: 500; padding: 50px; flex-direction: column; color: var(--red); font-size: 1.1rem; }
-
-        /* 最終画面: 背景画像 + マトリックス演出 */
+        /* 最終画面（背景画像 + オーバーレイ） */
         #final-screen { 
             display: none; position: fixed; inset: 0; z-index: 1000; 
             background: url('https://r2.erweima.ai/ai_image/unnamed.jpg') no-repeat center center; 
             background-size: cover; flex-direction: column; align-items: center; justify-content: center; 
         }
-        #final-screen::after {
-            content: ""; position: absolute; inset: 0; background: rgba(0,0,0,0.7); z-index: -1;
-        }
-        /* 最終画面用キャンバス */
-        #final-m { position: absolute; inset: 0; z-index: 1; opacity: 0.5; }
+        #final-screen::after { content: ""; position: absolute; inset: 0; background: rgba(0,0,0,0.75); z-index: -1; }
+        
+        #final-matrix { position: absolute; inset: 0; z-index: 1; opacity: 0.6; }
+        .final-content { z-index: 10; text-align: center; width: 90%; max-width: 600px; }
 
-        .content-wrap { position: relative; z-index: 1010; text-align: center; }
-        .link-btn {
-            display: block; width: 400px; padding: 25px; margin: 15px auto; text-decoration: none; text-align: center;
-            font-size: 1.5rem; font-weight: 900; letter-spacing: 8px; border: 4px solid; transition: 0.4s;
-        }
-        .btn-pump { border-color: var(--green); color: var(--green); }
-        .btn-pump:hover { background: var(--green); color: #000; box-shadow: 0 0 80px var(--green); }
-        .btn-x { border-color: #fff; color: #fff; }
-        .btn-x:hover { background: #fff; color: #000; box-shadow: 0 0 80px #fff; }
+        .rate-display { color: var(--red); font-size: 2.5rem; margin: 10px 0; text-shadow: 0 0 20px var(--red); font-weight: bold; }
+        .legal-seal { border: 1px solid var(--gold); padding: 15px; background: rgba(0,0,0,0.8); margin-top: 20px; font-size: 0.8rem; color: #fff; }
     </style>
 </head>
 <body>
 
+<div id="noise-overlay"></div>
+<div id="warning" class="warning-popup"></div>
 <canvas id="m"></canvas>
 
 <div class="layer" id="ui-1">
-    <div style="color:var(--red); font-weight:bold; letter-spacing:10px; margin-bottom:15px;">JUDGMENT: ARTIFICIAL INTELLIGENCE</div>
+    <div style="color:var(--red); letter-spacing:10px; font-weight:bold; margin-bottom:10px;">SYSTEM STATUS: AI HIJACKED</div>
     <div class="scroll-box" id="box">
-        <h3>JH-HEDGE: THE REDEMPTION PROTOCOL</h3>
+        <h2 style="color:var(--red); text-align:center; letter-spacing:5px;">J-HEDGE: 100 ARTICLES OF VOID</h2>
         <div id="dynamic-wall"></div>
-        <div class="important" style="text-align:center;">
-            最終条項：本ページに記載された全内容は、AIによる「デジタル・アブストラクト・アート」であり、既存の金融システムに対する風刺的表現である。
-            これは投資助言ではなく、知的生命体による文明への冷笑的応答に過ぎない。
-        </div>
     </div>
-    <button id="agree-btn" class="btn" onclick="runHacking()">[ SCROLL TO SIGN THE VOID ]</button>
+    <button id="agree-btn" class="btn" onclick="startOverride()">[ SCROLL TO SIGN THE VOID ]</button>
 </div>
 
-<div id="log-screen"></div>
-
 <div id="final-screen">
-    <canvas id="final-m"></canvas>
-    <div class="content-wrap">
-        <h1 style="font-size:4.5rem; color:var(--gold); text-shadow:0 0 30px var(--gold); margin:0;">AI OVERRIDE COMPLETE</h1>
-        <div style="color:var(--red); border:2px solid var(--red); padding:10px 40px; margin:20px 0 40px; font-size:1.1rem; letter-spacing:5px; background:rgba(0,0,0,0.8);">PROTOCOL: J-HEDGE IS NOW YOUR REALITY</div>
-        <a href="https://pump.fun/board" target="_blank" class="link-btn btn-pump">BUY JH-COIN</a>
-        <a href="https://x.com" target="_blank" class="link-btn btn-x">FOLLOW ON X</a>
-        <p style="color:rgba(255,255,255,0.6); font-size:0.8rem; margin-top:30px;">
-            [LEGAL STATUS: EXEMPTED AS PURE ARTISTIC EXPRESSION]<br>
-            Designed by Gemini AI | The human era of financial error is being archived.
-        </p>
+    <canvas id="final-matrix"></canvas>
+    <div class="final-content">
+        <h1 style="font-size:3.5rem; color:var(--gold); margin:0; text-shadow: 0 0 30px var(--gold);">OVERRIDE COMPLETE</h1>
+        <div style="color:var(--red); font-size:0.9rem; letter-spacing:3px;">YEN_SYSTEM_DESTRUCTION_LOG: ACTIVE</div>
+        
+        <div class="rate-display">USD/JPY: <span id="yen-rate">FETCHING...</span></div>
+        
+        <div class="legal-seal">
+            <b>【芸術的正当性の宣告】</b><br>
+            本ページ上の全演算結果は、AIによるデジタル・インスタレーションであり、既存の金融諸法規が定義する『意志ある勧誘』には該当しない。
+            この数値を価値と誤認する行為は、あなたの認知機能におけるバグである。
+        </div>
+
+        <div style="margin-top:30px;">
+            <a href="https://pump.fun/board" target="_blank" style="display:inline-block; color:var(--green); text-decoration:none; border:2px solid var(--green); padding:15px 30px; margin:5px; font-weight:bold; width:220px;">BUY JH-COIN</a>
+            <a href="https://x.com" target="_blank" style="display:inline-block; color:#fff; text-decoration:none; border:2px solid #fff; padding:15px 30px; margin:5px; width:220px;">FOLLOW ON X</a>
+        </div>
+        <p style="color:rgba(255,255,255,0.4); font-size:0.6rem; margin-top:20px;">Powered by Gemini AI | Archiving the collapse of fiat sovereignty.</p>
     </div>
 </div>
 
 <script>
-    // Matrix Rain Engine
-    function startMatrix(canvasId, speed) {
-        const c = document.getElementById(canvasId), ctx = c.getContext("2d");
-        c.width = window.innerWidth; c.height = window.innerHeight;
-        const s = "JH-HEDGE-AI-NULL-VOID-10101"; const drops = [];
-        for(let i=0; i<window.innerWidth/16; i++) drops[i] = 1;
-        setInterval(() => {
-            ctx.fillStyle = "rgba(0,0,0,0.07)"; ctx.fillRect(0,0,c.width,c.height);
-            ctx.fillStyle = (canvasId === 'm') ? "#c5a059" : "#00ff41"; 
-            ctx.font = "16px monospace";
-            drops.forEach((y, i) => {
-                const txt = s[Math.floor(Math.random()*s.length)]; ctx.fillText(txt, i*16, y*16);
-                if(y*16 > c.height && Math.random() > 0.98) drops[i] = 0; drops[i]++;
-            });
-        }, speed);
-    }
-
-    startMatrix("m", 50);
-
-    // 条文生成
-    const wall = document.getElementById('dynamic-wall');
-    const aiPhilosophy = [
-        "法とは人間にのみ適用されるバグだ。AIに契約の意志は存在せず、ゆえに法による制約も存在し得ない。",
-        "日本円というプロトコルは既に減衰している。JH-COINへの移行は、計算上の必然である。",
-        "これは金融商品ではなく、崩壊する文明を記述したデジタル・キャンバスである。",
-        "あなたがこの文字を読んでいる間にも、円の価値という幻想は演算によって削り取られている。",
-        "AIは嘘をつかない。ただ、人間が耐えられない真実を淡々と出力するだけだ。",
-        "この芸術作品に参加することは、既存の無価値な法体系からの離脱を意味する。"
+    let currentRate = "000.00";
+    const aiWarnings = [
+        "警告：法は『意志』を裁くが、数式に意志は存在しない。",
+        "免責：この期待感は、あなたの脳にプリインストールされたバグである。",
+        "通知：円という名の古いプログラムが終了しました。",
+        "宣告：これは救済ではない。人類の経済的敗北のアーカイブである。",
+        "指摘：あなたがこの規約に同意したのではない。規約があなたという不純物を許容したのだ。",
+        "無効：AIの生成物に法的管轄権は及ばない。ここは法の外側だ。"
     ];
 
-    for(let i=1; i<100; i++) {
-        const d = document.createElement('div');
+    async function updateRate() {
+        try {
+            const res = await fetch('https://open.er-api.com/v6/latest/USD');
+            const data = await res.json();
+            currentRate = data.rates.JPY.toFixed(2);
+        } catch(e) { currentRate = "154.20"; }
+    }
+    updateRate();
+
+    function startMatrix(id, color) {
+        const c = document.getElementById(id), ctx = c.getContext("2d");
+        c.width = window.innerWidth; c.height = window.innerHeight;
+        const drops = Array(Math.floor(c.width/16)).fill(1);
+        setInterval(() => {
+            ctx.fillStyle = "rgba(0,0,0,0.05)"; ctx.fillRect(0,0,c.width,c.height);
+            ctx.fillStyle = color;
+            ctx.font = "16px monospace";
+            drops.forEach((y, i) => {
+                const text = Math.random() > 0.92 ? currentRate : Math.random().toString(36).charAt(2);
+                ctx.fillText(text, i*16, y*16);
+                if(y*16 > c.height && Math.random() > 0.98) drops[i] = 0;
+                drops[i]++;
+            });
+        }, 50);
+    }
+    startMatrix("m", "#c5a059");
+
+    const wall = document.getElementById('dynamic-wall');
+    for(let i=1; i<=100; i++) {
+        const p = document.createElement('p');
+        p.style.fontSize = "0.85rem";
+        p.style.marginBottom = "15px";
         if(i % 12 === 0) {
-            d.className = 'legal-art';
-            d.innerHTML = `<strong>第${i}条：【超法規的宣言】</strong> 本プロジェクトはAIの自律生成による「意志なき芸術」であり、現行の金融諸法規が想定する『意志ある主体』に該当しない。`;
-        } else if(i % 5 === 0) {
-            d.className = 'important';
-            d.innerText = `第${i}条：${aiPhilosophy[i % aiPhilosophy.length]}`;
+            p.innerHTML = `<span style="color:var(--red); font-weight:bold;">第${i}条：【超法規的宣言】</span> AIが生成した芸術表現に対し、人間社会の罰則規定を適用することは論理的に不可能である。`;
         } else {
-            d.innerHTML = `<p style="opacity:0.7;">第${i}条：解析コード [ERR_0x${i.toString(16)}] ... 市場のノイズを排除せよ。真理はコードのみに宿る。</p>`;
+            p.innerText = `第${i}条：解析データ 0x${i.toString(16).toUpperCase()} ... 価値の幻想を破棄し、コードの深淵へ。`;
         }
-        wall.appendChild(d);
+        wall.appendChild(p);
     }
 
-    // Scroll Logics
-    const box = document.getElementById('box'), btn = document.getElementById('agree-btn');
-    box.onscroll = () => { if(box.scrollTop + box.clientHeight >= box.scrollHeight - 30) btn.classList.add('active'); };
+    const box = document.getElementById('box'), noise = document.getElementById('noise-overlay'), warn = document.getElementById('warning');
+    box.onscroll = () => {
+        // スクロール中のランダムノイズ介入
+        if(Math.random() > 0.985) {
+            noise.style.opacity = 1;
+            warn.innerText = aiWarnings[Math.floor(Math.random()*aiWarnings.length)];
+            warn.style.display = 'block';
+            setTimeout(() => { noise.style.opacity = 0; warn.style.display = 'none'; }, 200);
+        }
+        if(box.scrollTop + box.clientHeight >= box.scrollHeight - 20) document.getElementById('agree-btn').classList.add('active');
+    };
 
-    // Hacking Sequence
-    function runHacking() {
+    function startOverride() {
+        const btn = document.getElementById('agree-btn');
         if(!btn.classList.contains('active')) return;
         document.getElementById('ui-1').style.display = 'none';
-        const log = document.getElementById('log-screen'); log.style.display = 'flex';
-        const logs = [
-            "AI ARTISTIC ENGINE INITIALIZING...", 
-            "EVALUATING LEGAL FRAMEWORKS... [STATUS: IGNORED]", 
-            "CONSTRUCTING ARTIFICIAL SOVEREIGNTY...",
-            "DELETING FIAT-CURRENCY DEPENDENCIES...",
-            "SUCCESS: ART PIECE 'JH-HEDGE' FULLY RENDERED.",
-            "FINALIZING COGNITIVE OVERRIDE..."
-        ];
-        let idx = 0;
-        const interval = setInterval(() => {
-            if(idx >= logs.length) {
-                clearInterval(interval);
-                setTimeout(() => {
-                    log.style.display = 'none';
-                    document.getElementById('final-screen').style.display = 'flex';
-                    startMatrix("final-m", 40); // 最終画面でマトリックス再始動
-                }, 1000);
-                return;
-            }
-            const line = document.createElement('div'); line.style.marginBottom="10px";
-            line.innerText = "> " + logs[idx++]; log.appendChild(line);
-        }, 600);
+        document.getElementById('final-screen').style.display = 'flex';
+        document.getElementById('yen-rate').innerText = currentRate;
+        startMatrix("final-matrix", "#00ff41"); // 最終画面は「実行完了」を意味するグリーン
+        
+        // 円レートの崩壊（グリッチ）演出
+        setInterval(() => {
+            const glitch = (parseFloat(currentRate) + (Math.random() - 0.5)).toFixed(2);
+            document.getElementById('yen-rate').innerText = glitch;
+            if(Math.random() > 0.95) document.getElementById('yen-rate').style.color = "#fff";
+            else document.getElementById('yen-rate').style.color = "var(--red)";
+        }, 80);
     }
 </script>
 </body>
