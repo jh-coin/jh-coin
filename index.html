@@ -6,68 +6,104 @@
     <title>J-HEDGE | SYSTEM OVERRIDE</title>
     <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Shippori+Mincho:wght@800&display=swap" rel="stylesheet">
     <style>
-        :root { --bg: #000; --gold: #c5a059; --red: #ff0000; --green: #00ff41; --dim: #333; }
-        body, html { margin: 0; padding: 0; background: var(--bg); color: var(--gold); font-family: 'Share Tech Mono', 'Shippori Mincho', serif; height: 100vh; overflow: hidden; }
+        :root { --bg: #000; --gold: #c5a059; --red: #ff0000; --green: #00ff41; --dim: #222; }
+        body, html { margin: 0; padding: 0; background: var(--bg); color: var(--gold); font-family: 'Share Tech Mono', serif; height: 100vh; overflow: hidden; }
         
-        canvas { position: absolute; top: 0; left: 0; z-index: 1; opacity: 0.4; }
+        /* スキャンライン（走査線）効果 */
+        body::before {
+            content: " "; display: block; position: absolute; top: 0; left: 0; bottom: 0; right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            z-index: 100; background-size: 100% 2px, 3px 100%; pointer-events: none;
+        }
 
-        /* 全体コンテナ */
-        .layer { position: absolute; inset: 0; z-index: 10; display: flex; flex-direction: column; align-items: center; justify-content: center; background: radial-gradient(circle, transparent 0%, rgba(0,0,0,0.8) 100%); padding: 20px; box-sizing: border-box; }
+        canvas { position: absolute; top: 0; left: 0; z-index: 1; opacity: 0.3; }
 
-        /* タイトルエリア */
-        .glitch-title { font-size: 3rem; font-weight: 800; color: var(--gold); letter-spacing: 0.2em; text-shadow: 2px 2px var(--red); margin-bottom: 10px; text-align: center; }
-        .subtitle { color: var(--red); font-size: 0.9rem; letter-spacing: 5px; margin-bottom: 20px; }
+        .layer { position: absolute; inset: 0; z-index: 10; display: flex; flex-direction: column; align-items: center; justify-content: center; background: radial-gradient(circle, transparent 0%, rgba(0,0,0,0.9) 100%); padding: 20px; box-sizing: border-box; }
 
-        /* 免責事項ボックス */
+        /* 免責事項 */
         .scroll-box {
-            width: 100%; max-width: 700px; height: 350px; overflow-y: scroll;
-            background: rgba(0,0,0,0.9); border: 1px solid var(--red);
-            padding: 25px; text-align: left; font-size: 0.85rem; color: #aaa;
+            width: 100%; max-width: 650px; height: 350px; overflow-y: scroll;
+            background: rgba(0,0,0,0.95); border: 1px solid var(--red);
+            padding: 25px; text-align: left; font-size: 0.85rem; color: #888;
             margin-bottom: 20px; line-height: 2; scrollbar-width: thin; scrollbar-color: var(--red) #000;
         }
-        .scroll-box p { margin: 20px 0; border-bottom: 1px solid #1a1a1a; padding-bottom: 10px; }
-        .important { color: var(--red); font-weight: bold; background: rgba(255,0,0,0.1); padding: 5px; }
-        .legal { color: #fff; font-style: italic; border-left: 2px solid var(--gold); padding-left: 10px; margin: 10px 0; }
+        .important { color: var(--red); font-weight: bold; background: rgba(255,0,0,0.1); }
+        .legal { color: #fff; font-style: italic; border-left: 2px solid var(--gold); padding-left: 10px; margin: 15px 0; font-size: 0.8rem; }
 
-        /* ボタン */
+        /* 初期ボタン */
         .btn {
-            background: transparent; color: var(--dim); border: 2px solid var(--dim);
-            padding: 20px 50px; font-size: 1.2rem; cursor: not-allowed; transition: 0.5s;
-            pointer-events: none; text-transform: uppercase;
+            background: transparent; color: var(--dim); border: 1px solid var(--dim);
+            padding: 15px 40px; font-size: 1rem; cursor: not-allowed; transition: 0.5s;
         }
         .btn.active { 
-            border-color: var(--gold); color: var(--gold); cursor: pointer; pointer-events: auto;
-            background: rgba(197, 160, 89, 0.1); box-shadow: 0 0 20px var(--gold); 
+            border: 2px solid var(--gold); color: var(--gold); cursor: pointer; pointer-events: auto;
+            box-shadow: 0 0 15px var(--gold); animation: pulse 1.5s infinite;
         }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.7; } 100% { opacity: 1; } }
 
-        /* ログ演出（画面下部） */
+        /* ログ（画面下部） */
         #log-overlay {
-            position: fixed; bottom: 0; left: 0; width: 100%; height: 150px;
-            background: rgba(0,0,0,0.8); color: var(--red); font-family: monospace;
-            font-size: 0.8rem; padding: 15px; box-sizing: border-box; z-index: 100;
-            overflow: hidden; border-top: 1px solid var(--red); display: none;
+            position: fixed; bottom: 0; left: 0; width: 100%; height: 120px;
+            background: rgba(0,0,0,0.9); color: var(--red); font-size: 0.75rem; padding: 15px;
+            box-sizing: border-box; z-index: 200; display: none; border-top: 1px solid var(--red);
         }
 
-        /* 最終画面 (ACCESS GRANTED) */
+        /* --- 最終画面 (ACCESS GRANTED) --- */
         #final-screen {
             display: none; position: fixed; inset: 0; z-index: 1000;
             background: #000; flex-direction: column; align-items: center; justify-content: center;
-            animation: fadeIn 1s forwards;
         }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        .granted-title { font-size: 3.5rem; color: var(--gold); text-shadow: 0 0 20px var(--gold); margin: 0; font-family: 'Share Tech Mono'; }
-        .protocol-tag { color: var(--red); border: 1px solid var(--red); padding: 5px 20px; margin: 10px 0 40px; font-size: 1.2rem; }
+        .granted-title { 
+            font-size: 3.5rem; color: var(--gold); text-shadow: 0 0 10px var(--gold); margin: 0; 
+            letter-spacing: 10px; animation: textGlitch 0.2s infinite; 
+        }
+        @keyframes textGlitch {
+            0% { transform: translate(0); }
+            20% { transform: translate(-2px, 2px); }
+            40% { transform: translate(-2px, -2px); }
+            60% { transform: translate(2px, 2px); }
+            80% { transform: translate(2px, -2px); }
+            100% { transform: translate(0); }
+        }
 
+        .protocol-tag { color: var(--red); border: 1px solid var(--red); padding: 5px 30px; margin: 15px 0 50px; font-size: 1rem; letter-spacing: 3px; }
+
+        /* 改編リンクボタン */
+        .link-wrapper { position: relative; width: 380px; margin: 20px; }
+        
         .link-btn {
-            display: block; width: 350px; padding: 25px; margin: 15px;
-            text-decoration: none; text-align: center; font-size: 1.3rem;
-            font-weight: bold; transition: 0.4s; border: 3px solid;
+            display: block; width: 100%; padding: 25px; text-decoration: none; text-align: center;
+            font-size: 1.5rem; font-weight: 900; letter-spacing: 5px; transition: 0.3s;
+            border: 2px solid; position: relative; z-index: 2;
         }
-        .btn-pump { border-color: #00ff41; color: #00ff41; background: rgba(0, 255, 65, 0.05); box-shadow: 0 0 15px rgba(0,255,65,0.2); }
-        .btn-pump:hover { background: #00ff41; color: #000; box-shadow: 0 0 40px #00ff41; }
-        .btn-x { border-color: #fff; color: #fff; background: rgba(255,255,255,0.05); }
-        .btn-x:hover { background: #fff; color: #000; box-shadow: 0 0 40px #fff; }
+
+        .btn-pump { 
+            border-color: var(--green); color: var(--green); 
+            background: rgba(0, 255, 65, 0.05);
+            box-shadow: 0 0 10px rgba(0, 255, 65, 0.3);
+        }
+        .btn-pump:hover { 
+            background: var(--green); color: #000; 
+            box-shadow: 0 0 50px var(--green);
+            transform: scale(1.05);
+        }
+
+        .btn-x { 
+            border-color: #fff; color: #fff; 
+            background: rgba(255, 255, 255, 0.05);
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+        }
+        .btn-x:hover { 
+            background: #fff; color: #000; 
+            box-shadow: 0 0 50px #fff;
+            transform: scale(1.05);
+        }
+
+        /* 装飾用角パーツ */
+        .corner { position: absolute; width: 10px; height: 10px; border: 2px solid var(--red); z-index: 3; }
+        .tl { top: -5px; left: -5px; border-right: none; border-bottom: none; }
+        .tr { top: -5px; right: -5px; border-left: none; border-bottom: none; }
     </style>
 </head>
 <body>
@@ -75,20 +111,20 @@
 <canvas id="m"></canvas>
 
 <div class="layer" id="ui-1">
-    <div class="glitch-title">J-HEDGE PROTOCOL</div>
-    <div class="subtitle">STATE OF EMERGENCY</div>
+    <div class="granted-title" style="font-size: 2.5rem; animation: none;">J-HEDGE</div>
+    <div class="protocol-tag">RESTRICTED ACCESS</div>
     
     <div class="scroll-box" id="box">
-        <h3 style="color:var(--red); text-align:center;">魂の譲渡及び日本円完全放棄規約 (100 ARTICLES)</h3>
-        <p class="important">第1条：日本円が中央銀行による壮大なポンジスキームであることを認め、その崩壊に際して一切の公的救済を期待しないことに同意する。</p>
-        <p class="legal">引用：金融商品取引法 第37条の6（書面による解除）...本プロトコルは「信仰」であるため、クーリングオフの概念を抹消する。</p>
-        <p>第2条：失われた30年は永遠に続く。利用者は、増税と右翼の台頭をエンターテインメントとして消費せよ。</p>
-        <p class="legal">引用：民法 第709条（不法行為）...自ら望んで深淵を覗く者に、法的な損害賠償は存在しない。</p>
+        <h3 style="color:var(--red); text-align:center; border-bottom:1px solid var(--red);">魂の最終清算規約</h3>
+        <p class="important">第1条：日本円が中央銀行による壮大なポンジスキームであることを認め、その崩壊に際して一切の公的救済を期待しない。</p>
+        <p class="legal">引用：金融商品取引法 第37条の6...信仰にはクーリングオフなど存在しない。</p>
+        <p>第2条：失われた30年は永遠に続く。利用者は、増税と右翼の台撃をエンターテインメントとして消費せよ。</p>
+        <p class="legal">引用：民法 第709条...自ら深淵を覗く者に法的救済はない。</p>
         <div id="dynamic-content"></div>
         <p class="important" style="text-align:center; margin-top:50px;">第100条：ここから先は「日本人」であることを辞め、「J-HEDGE」に魂を売却することを誓約する。</p>
     </div>
 
-    <button id="agree-btn" class="btn" onclick="startSequence()">[ SCROLL TO SIGN ]</button>
+    <button id="agree-btn" class="btn" onclick="startSequence()">[ SCROLL TO AGREE ]</button>
 </div>
 
 <div id="log-overlay"></div>
@@ -97,17 +133,23 @@
     <h1 class="granted-title">ACCESS GRANTED</h1>
     <div class="protocol-tag">CONFIDENTIAL PROTOCOL</div>
     
-    <a href="https://pump.fun/board" target="_blank" class="link-btn btn-pump">BUY JH-COIN</a>
-    <a href="https://x.com" target="_blank" class="link-btn btn-x">FOLLOW ON X</a>
+    <div class="link-wrapper">
+        <div class="corner tl"></div><div class="corner tr"></div>
+        <a href="https://pump.fun/board" target="_blank" class="link-btn btn-pump">BUY JH-COIN</a>
+    </div>
+
+    <div class="link-wrapper">
+        <a href="https://x.com" target="_blank" class="link-btn btn-x">FOLLOW ON X</a>
+    </div>
     
-    <p style="color:var(--dim); margin-top:30px; font-size:0.7rem;">SYSTEM STATUS: OVERRIDE SUCCESSFUL</p>
+    <p style="color:var(--dim); font-size:0.7rem; margin-top:40px;">ENCRYPTION: AES-256-JH | STATUS: COMPROMISED</p>
 </div>
 
 <script>
-    // 1. Matrix Background
+    // Matrix
     const c = document.getElementById("m"), ctx = c.getContext("2d");
     c.width = window.innerWidth; c.height = window.innerHeight;
-    const s = "JH-HEDGE0101"; const drops = [];
+    const s = "JH10"; const drops = [];
     for(let i=0; i<window.innerWidth/16; i++) drops[i] = 1;
     function draw() {
         ctx.fillStyle = "rgba(0,0,0,0.05)"; ctx.fillRect(0,0,c.width,c.height);
@@ -115,36 +157,30 @@
         drops.forEach((y, i) => {
             const txt = s[Math.floor(Math.random()*s.length)];
             ctx.fillText(txt, i*16, y*16);
-            if(y*16 > c.height && Math.random() > 0.975) drops[i] = 0;
+            if(y*16 > c.height && Math.random() > 0.98) drops[i] = 0;
             drops[i]++;
         });
     }
-    setInterval(draw, 35);
+    setInterval(draw, 40);
 
-    // 2. 100 Articles Generation
+    // 100条生成
     const target = document.getElementById('dynamic-content');
-    const lines = [
-        "年金は若者からの収奪であり、あなたは既に国家の「奴隷」である。",
-        "円安は仕様である。貯金が紙屑になる前にJH-COINへ換装せよ。",
-        "街宣車の叫びより、ブロックチェーンの静寂を信頼せよ。",
-        "少子高齢化を嘆く暇があるなら、自分のポートフォリオを心配せよ。",
-        "このサイトの閲覧により、あなたの思考は既存の法規制から解放される。"
-    ];
+    const ph = ["年金は収奪である。","円安は加速する。","右翼の叫びを無視せよ。","JH-COINこそが唯一の出口。","既存の法規制は無力である。"];
     for(let i=3; i<100; i++) {
         const p = document.createElement('p');
-        p.innerText = `第${i}条：` + lines[Math.floor(Math.random()*lines.length)];
+        p.innerText = `第${i}条：` + ph[Math.floor(Math.random()*ph.length)];
         target.appendChild(p);
     }
 
-    // 3. Scroll Check
+    // Scroll Logic
     const box = document.getElementById('box'), btn = document.getElementById('agree-btn');
     box.onscroll = () => {
-        if(box.scrollTop + box.clientHeight >= box.scrollHeight - 10) {
-            btn.classList.add('active'); btn.innerText = "INITIALIZE ASCENSION";
+        if(box.scrollTop + box.clientHeight >= box.scrollHeight - 15) {
+            btn.classList.add('active'); btn.innerText = "EXECUTE PROTOCOL";
+            btn.style.pointerEvents = "auto";
         }
     };
 
-    // 4. Sequence
     function startSequence() {
         if(!btn.classList.contains('active')) return;
         document.getElementById('ui-1').style.display = 'none';
@@ -152,12 +188,9 @@
         log.style.display = 'block';
         
         const msgs = [
-            "> DELETING NATIONAL IDENTITY...",
-            "> BYPASSING FINANCIAL JURISDICTION...",
-            "> LIQUIDATING YEN ASSETS...",
-            "> OVERRIDING ARTICLE 9 OF PORTFOLIO...",
-            "> JH-COIN PROTOCOL: [ENGAGED]",
-            "> WELCOME TO THE NEW ORDER."
+            "> DELETING NATIONAL IDENTITY...", "> LIQUIDATING YEN ASSETS...",
+            "> BYPASSING FIAT FIREWALL...", "> ACCESSING INNER CORE...",
+            "> JH-COIN: [SYNCHRONIZED]", "> WELCOME, OPERATOR."
         ];
         
         let i = 0;
@@ -167,14 +200,14 @@
                 setTimeout(() => {
                     log.style.display = 'none';
                     document.getElementById('final-screen').style.display = 'flex';
-                }, 1000);
+                }, 800);
                 return;
             }
             const d = document.createElement('div');
-            d.innerText = msgs[i];
+            d.innerText = msgs[i++];
             log.appendChild(d);
-            i++;
-        }, 600);
+            log.scrollTop = log.scrollHeight;
+        }, 500);
     }
 </script>
 </body>
