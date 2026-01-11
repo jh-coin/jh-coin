@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>J-HEDGE | 100 ARTICLES OF DESPAIR</title>
+    <title>J-HEDGE | THE TOTALITARIAN CONTRACT</title>
     <style>
         :root { --bg: #030303; --gold: #c5a059; --red: #ff0000; --dim: #333; }
         body { margin: 0; background: var(--bg); color: var(--gold); font-family: 'Shippori Mincho', serif; height: 100vh; overflow: hidden; }
@@ -16,24 +16,27 @@
             padding: 20px; box-sizing: border-box; 
         }
         
-        .glitch { font-size: 2.5rem; font-weight: 800; color: var(--gold); letter-spacing: 0.2em; text-shadow: 2px 2px var(--red); margin-bottom: 0.5rem; }
+        .glitch { font-size: 2.2rem; font-weight: 800; color: var(--gold); letter-spacing: 0.2em; text-shadow: 2px 2px var(--red); margin-bottom: 0.5rem; }
 
         .disclaimer-box {
-            width: 100%; max-width: 650px; height: 400px; overflow-y: scroll;
+            width: 100%; max-width: 700px; height: 450px; overflow-y: scroll;
             background: rgba(5,5,5,0.98); border: 2px solid var(--red);
-            padding: 25px; text-align: left; font-size: 0.85rem; color: #999;
-            margin: 20px 0; line-height: 2; scrollbar-width: thin; scrollbar-color: var(--red) #000;
+            padding: 25px; text-align: left; font-size: 0.85rem; color: #aaa;
+            margin: 20px 0; line-height: 2.2; scrollbar-width: thin; scrollbar-color: var(--red) #000;
         }
-        .disclaimer-box p { margin: 20px 0; border-bottom: 1px solid #1a1a1a; padding-bottom: 10px; }
-        .important { color: var(--red); font-weight: bold; background: rgba(255,0,0,0.1); padding: 2px 5px; }
+        .disclaimer-box p { margin: 25px 0; border-bottom: 1px solid #1a1a1a; padding-bottom: 15px; }
+        .important { color: var(--red); font-weight: bold; background: rgba(255,0,0,0.15); padding: 5px; border-radius: 3px; }
+        .legal-quote { color: #fff; font-style: italic; border-left: 3px solid var(--gold); padding-left: 15px; font-size: 0.8rem; background: rgba(197, 160, 89, 0.05); margin: 10px 0; }
 
         .btn {
             background: transparent; color: var(--dim); border: 2px solid var(--dim);
-            padding: 20px 50px; font-size: 1.2rem; cursor: not-allowed; transition: 0.5s; font-family: monospace;
+            padding: 20px 50px; font-size: 1.1rem; cursor: not-allowed; transition: 0.5s; font-family: monospace;
+            pointer-events: none;
         }
         .btn.enabled { 
             border-color: var(--gold); color: var(--gold); cursor: pointer; 
-            background: rgba(197, 160, 89, 0.2); box-shadow: 0 0 30px rgba(197, 160, 89, 0.5); 
+            background: rgba(197, 160, 89, 0.2); box-shadow: 0 0 40px rgba(197, 160, 89, 0.5); 
+            pointer-events: auto;
         }
 
         #console-log { display: none; position: fixed; inset: 0; background: #000; color: #0f0; padding: 30px; font-family: monospace; z-index: 1000; overflow-y: auto; }
@@ -45,63 +48,66 @@
     <canvas id="matrix"></canvas>
     <div class="container" id="main-ui">
         <div class="glitch">J-HEDGE PROTOCOL</div>
-        <p style="color:var(--red); letter-spacing: 3px;">[ 日本国居住者：最終警告 ]</p>
+        <p style="color:var(--red); font-size: 0.8rem;">[ 非国民的暗号資産への同意プロトコル ]</p>
         
         <div id="disclaimer-box" class="disclaimer-box">
-            <h3 style="color:var(--red); text-align:center; font-size:1.2rem; border-bottom: 2px solid var(--red); padding-bottom:10px;">魂の譲渡及び日本円完全放棄規約</h3>
+            <h3 style="color:var(--red); text-align:center; font-size:1.3rem; border-bottom: 3px double var(--red); padding-bottom:15px;">大日本経済崩壊及びJH-COINへの魂のアップロード規約</h3>
             
-            <p class="important">第1条：利用者は、日本円が中央銀行による壮大なポンジスキームであることを認め、その崩壊に際して一切の公的救済を期待しないことに同意する。</p>
-            <p>第2条：失われた30年は今後40年、50年へと延長される。利用者はこの絶望的な未来を受け入れ、JH-COINのみを救済とする。</p>
-            <p>第3条：金融庁の「投資家保護」という言葉は、利用者を守るためではなく、既存の銀行システムを延命させるための嘘であることを承認する。</p>
-            <p>第4条：昨今の右翼的ナショナリズムの台頭は、経済的没落から目を逸らすための演出であり、利用者は愛国心によって空腹を満たすことはできないと誓う。</p>
-            <p>第5条：増税、社会保険料の増大、実質賃金の低下。これら全てを運営者による「難易度調整」として笑って受け入れること。</p>
-            <p>第6条：街宣車の騒音やネット上の誹謗中傷、極端な政治思想に脳を汚染されないよう、常にJH-COINのチャートを凝視し続けること。</p>
-            <p>第7条：利用者が本システムで損失を出したとしても、それは日本国の衰退という大きな潮流の一部に過ぎず、自己責任の範疇を超えるものではない。</p>
-            <p>第8条：銀行に預けた100万円が将来100円の価値になろうとも、それは自己判断の欠如であり、本システムは何ら補填を行わない。</p>
-            <p>第9条：老後2000万円問題は、JH-COINを100枚保有することで解決されると一方的に信じ込むこと。</p>
-            <p>第10条：利用者は、日本という国家が「沈みゆく泥舟」であることを毎日三回復唱し、精神の安定を保つこと。</p>
+            <p class="important">第1条（国家破綻の受容）：利用者は、日本円が「もはや価値を保存できない中央銀行のポンジスキーム」であることを認め、国家という幻想の崩壊に伴いJH-COINを唯一の絶対的ヘッジとすることに同意する。</p>
+            
+            <p class="legal-quote">【金融商品取引法 第37条の6 逆説的引用】<br>「書面を受領した日から十日を経過するまでは契約解除ができる」という規定は、本サイトの及ぶデジタル治外法権においては無効とする。信仰にはクーリングオフなど存在しない。</p>
 
-            <div id="scroll-target"></div>
+            <p>第2条（失われた未来への呪詛）：失われた30年は今後永遠に続く。利用者は、増税、社会保険料増大、政治家の不祥事、および無意味な精神論を「エンターテインメント」として消費し、怒りを買い注文へと変換しなければならない。</p>
 
-            <p class="important" style="text-align:center; font-size:1.2rem; margin-top:50px;">第100条：ここから先は「日本人」としての権利を放棄し、「J-HEDGEの同志」としての義務を全うすることを血判を持って誓約する。</p>
-            <p style="text-align:center; color:var(--red); font-weight:bold;">[ スクロール完了：システムを解凍します ]</p>
+            <p class="legal-quote">【民法 第709条 不法行為の否定】<br>「故意又は過失によって他人の利益を侵害した者は賠償責任を負う」が、本サイトは「価値ゼロの可能性」を誠実に明示している。したがって、自らボタンを押す行為は「自発的破滅」であり、賠償の対象外である。</p>
+
+            <p>第3条（ナショナリズムの拒絶）：街宣車の騒音や極端な愛国思想は、腹を満たすことも資産を守ることもできない。利用者は「愛国心」を「JH-COINへの忠誠心」へと全置換することを誓う。</p>
+
+            <p class="legal-quote">【刑法 第246条 詐欺の回避】<br>「人を欺いて財物を交付させる」のが詐欺であるが、我々は「これはアートであり、ゴミになる可能性が高い」と宣言している。この「誠実な絶望」の提示により、詐欺罪は成立不可能である。</p>
+
+            <p>第4条（自己責任の極致）：レバレッジによる破産、ウォレットの紛失、あるいは日本政府による突然の資産凍結。これら全ての惨事に対し、管理者は「運がなかったな」と一蹴する権利を保有する。</p>
+
+            <div id="dynamic-articles"></div>
+
+            <p class="important" style="text-align:center; font-size:1.2rem; margin-top:60px;">第100条（最終決別）：利用者は、日本という国家が「沈みゆく泥舟」であることを認め、最後の1人が沈むまでJH-COINを保持（HODL）し続けることを、血とビットをもって誓約する。</p>
+            <p style="text-align:center; color:var(--red); font-weight:bold;">[ スクロール完了：ゲートを開放します ]</p>
         </div>
 
-        <button id="hack-btn" class="btn" onclick="execute()">[ SCROLL TO SIGN ]</button>
+        <button id="hack-btn" class="btn" onclick="execute()">[ SCROLL TO AGREE ]</button>
     </div>
 
     <div id="console-log"></div>
     <div id="success-screen">
-        <h2 style="color:var(--gold); font-size:2rem;">WELCOME TO THE NEW ORDER</h2>
+        <h2 style="color:var(--gold); font-size:2rem; font-family: monospace;">ACCESS GRANTED</h2>
         <a href="https://pump.fun/board" target="_blank" class="link-btn" style="border-color:#16c784; color:#16c784;">BUY JH-COIN</a>
         <a href="https://x.com" target="_blank" class="link-btn" style="border-color:#fff; color:#fff;">FOLLOW ON X</a>
     </div>
 
     <script>
-        // 11条から99条を生成
-        const target = document.getElementById('scroll-target');
-        const phrases = [
-            "年金システムは既に破綻しており、若者の拠出は単なる「富の収奪」であることを認める。",
-            "政治家の不祥事に腹を立てるエネルギーを、JH-COINの買い注文に変換せよ。",
-            "円安を嘆く前に、なぜドル建て資産や暗号資産を持っていないのか自問自答せよ。",
-            "少子高齢化は「仕様」であり、この国が消滅するカウントダウンは既に始まっている。",
-            "街宣車の愛国ソングよりも、ビットコインのマイニング音が心地よく感じるまで修行せよ。",
-            "国民負担率が50%を超えた今、もはやあなたは国家の奴隷であることを自覚せよ。",
-            "コンビニの弁当が小さくなるたびに、日本経済の縮小を実感し、JH-COINを握り締めよ。",
-            "空き家問題、インフラ老朽化。全てを「デストピア・エンターテインメント」として消費せよ。",
-            "憲法改正論議よりも、スマートコントラクトの透明性を信頼すること。"
+        // 条文生成
+        const target = document.getElementById('dynamic-articles');
+        const contents = [
+            "年金システムは若者からの収奪であり、あなたは既に国家の「奴隷」であることを自覚せよ。",
+            "円安が1ドル500円になろうとも、我々はJH-COINという電子の聖域に逃げ込むのみである。",
+            "民法上の公序良俗に反しているのは、このサイトではなく、若者に希望を見せないこの国の構造そのものである。",
+            "所得税、住民税、消費税。毟り取られるだけの人生に、JH-COINによる一発逆転という反逆を企てよ。",
+            "少子高齢化というカウントダウンに対し、子供を増やすよりJH-COINを増やすほうが現実的であるという悲しい事実を認めよ。",
+            "憲法第29条の財産権を信頼するよりも、ブロックチェーンのスマートコントラクトを信仰せよ。",
+            "街宣車の叫びをBGMに、静かに日本の終焉を看取りながら買い注文を入れ続けること。",
+            "「投資は余裕資金で」という常識を捨て、「命を懸けて」挑む者だけがこの深淵を渡り切れる。",
+            "あなたの貯金がトイレットペーパー以下の価値になる前に、すべてをJH-COINへと換装せよ。"
         ];
-        
-        for(let i=11; i<100; i++){
+
+        for(let i=5; i<100; i++){
             const p = document.createElement('p');
-            p.innerText = `第${i}条：` + phrases[Math.floor(Math.random() * phrases.length)];
+            p.innerText = `第${i}条：` + contents[Math.floor(Math.random() * contents.length)];
             target.appendChild(p);
         }
 
         // Matrix
         const c=document.getElementById('matrix'), ctx=c.getContext('2d');
         c.width=window.innerWidth; c.height=window.innerHeight;
-        const s="JH-HEDGE10"; const drops=[];
+        const s="JH-HEDGE101010"; const drops=[];
         for(let i=0; i<window.innerWidth/16; i++) drops[i]=1;
         function draw(){
             ctx.fillStyle='rgba(0,0,0,0.05)'; ctx.fillRect(0,0,c.width,c.height);
@@ -115,37 +121,31 @@
         }
         setInterval(draw,30);
 
-        // Scroll Logic
+        // Scroll
         const dBox=document.getElementById('disclaimer-box'), btn=document.getElementById('hack-btn');
         dBox.onscroll = () => {
-            // かなり厳しめの判定（一番下までしっかりスクロールさせる）
             if(dBox.scrollTop + dBox.clientHeight >= dBox.scrollHeight - 10) {
                 btn.classList.add('enabled'); 
-                btn.style.pointerEvents = "auto";
-                btn.innerText = "I AGREE TO ALL CHAOS";
+                btn.innerText = "I SWEAR TO HODL";
             }
         };
 
-        // Execution
         function execute() {
             if(!btn.classList.contains('enabled')) return;
             document.getElementById('main-ui').style.display='none';
             const log=document.getElementById('console-log'); log.style.display='block';
             const msgs=[
-                "RENOUNCING CITIZENSHIP...", 
-                "LIQUIDATING FIAT ASSETS...", 
-                "DECODING 100 ARTICLES...", 
-                "J-HEDGE PROTOCOL ENGAGED.", 
-                "REDIRECTING TO LIBERATION..."
+                "RENOUNCING JAPANESE CITIZENSHIP...", 
+                "DELETING FIAT MINDSET...", 
+                "OVERRIDING CONSTITUTIONAL LIMITS...", 
+                "JH-COIN PROTOCOL ENGAGED.", 
+                "PREPARING FOR ASCENSION..."
             ];
             let i=0;
             const t=setInterval(()=>{
                 if(i>=msgs.length){ 
                     clearInterval(t); 
-                    setTimeout(()=>{ 
-                        log.style.display='none'; 
-                        document.getElementById('success-screen').style.display='flex'; 
-                    },800); 
+                    setTimeout(()=>{ log.style.display='none'; document.getElementById('success-screen').style.display='flex'; },1000); 
                     return; 
                 }
                 const div=document.createElement('div'); div.innerHTML="> " + msgs[i++]; 
