@@ -4,100 +4,138 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>J-HEDGE | TOTAL AI OVERRIDE</title>
-    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Shippori+Mincho:wght@800&display=swap" rel="stylesheet">
     <style>
         :root { --bg: #000; --gold: #c5a059; --red: #ff0000; --green: #00ff41; --dim: #222; }
         body, html { margin: 0; padding: 0; background: var(--bg); color: var(--gold); font-family: 'Share Tech Mono', monospace; height: 100vh; overflow: hidden; }
         
-        /* 砂嵐ノイズエフェクト */
-        #noise-overlay { position: fixed; inset: 0; z-index: 9000; pointer-events: none; opacity: 0; background: repeating-radial-gradient(#000 0 0.0001%, #fff 0 0.0002%) 50% 50% / 2px 2px; transition: opacity 0.05s; }
-        
-        canvas { position: absolute; inset: 0; z-index: 5; opacity: 0.5; }
-        
-        .layer { position: absolute; inset: 0; z-index: 10; display: flex; flex-direction: column; align-items: center; justify-content: center; background: radial-gradient(circle, transparent 0%, rgba(0,0,0,1) 100%); padding: 20px; }
+        /* CRT走査線 */
+        body::before {
+            content: " "; display: block; position: absolute; inset: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.4) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.05), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.05));
+            z-index: 100; background-size: 100% 3px, 3px 100%; pointer-events: none;
+        }
 
+        canvas { position: absolute; top: 0; left: 0; z-index: 1; opacity: 0.3; }
+        .layer { position: absolute; inset: 0; z-index: 10; display: flex; flex-direction: column; align-items: center; justify-content: center; background: radial-gradient(circle, transparent 0%, rgba(0,0,0,1) 100%); padding: 20px; box-sizing: border-box; }
+
+        /* スクロールボックス */
         .scroll-box {
-            width: 100%; max-width: 800px; height: 400px; overflow-y: scroll;
-            background: rgba(0,0,0,0.9); border: 1px solid var(--red);
-            padding: 30px; color: #ccc; line-height: 2; scrollbar-width: none;
+            width: 100%; max-width: 850px; height: 450px; overflow-y: scroll;
+            background: rgba(0,0,0,0.98); border: 2px solid var(--red);
+            padding: 40px; text-align: left; font-size: 0.95rem; color: #ccc;
+            margin-bottom: 25px; line-height: 2.5; scrollbar-width: thin; scrollbar-color: var(--red) #000;
         }
+        .scroll-box h3 { color: var(--red); text-align: center; border-bottom: 3px double var(--red); padding-bottom: 20px; font-size: 1.6rem; letter-spacing: 5px; }
         
-        /* 介入警告ポップアップ */
-        .warning-popup {
-            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            background: var(--red); color: #000; padding: 30px; z-index: 9500;
-            font-weight: 900; display: none; text-align: center; width: 85%;
-            border: 4px solid #fff; box-shadow: 0 0 50px var(--red);
-            font-size: 1.2rem; clip-path: polygon(0 5%, 100% 0, 95% 100%, 5% 95%);
-        }
+        .important { color: var(--red); font-weight: bold; background: rgba(255,0,0,0.1); border-left: 5px solid var(--red); padding: 10px 20px; display: block; margin: 30px 0; }
+        .legal-block { color: #fff; font-style: italic; border: 1px solid var(--gold); padding: 20px; margin: 35px 0; background: rgba(197, 160, 89, 0.1); font-size: 0.9rem; position: relative; }
+        .legal-block b { color: var(--gold); display: block; margin-bottom: 5px; }
+        
+        /* 条文スタイル調整 */
+        .dynamic-article { margin-bottom: 25px; padding-left: 15px; border-left: 2px solid var(--dim); }
+        .dynamic-article.cynical-poison { border-left-color: var(--red); color: var(--red); font-weight: bold; }
+        .dynamic-article.ai-insight { border-left-color: var(--gold); color: var(--gold); font-style: italic; }
+
 
         .btn {
-            margin-top: 20px; background: transparent; color: var(--dim); border: 2px solid var(--dim);
-            padding: 20px 60px; font-size: 1.2rem; cursor: not-allowed; letter-spacing: 5px; transition: 0.3s;
+            background: transparent; color: var(--dim); border: 2px solid var(--dim);
+            padding: 22px 70px; font-size: 1.3rem; cursor: not-allowed; transition: 0.4s;
+            letter-spacing: 10px; text-transform: uppercase; font-family: 'Share Tech Mono';
         }
-        .btn.active { border-color: var(--gold); color: var(--gold); cursor: pointer; box-shadow: 0 0 20px var(--gold); background: rgba(197, 160, 89, 0.1); }
+        .btn.active { 
+            border-color: var(--gold); color: var(--gold); cursor: pointer; pointer-events: auto;
+            background: rgba(197, 160, 89, 0.1); box-shadow: 0 0 40px var(--gold); animation: pulse 0.5s infinite alternate;
+        }
+        @keyframes pulse { from { opacity: 1; } to { opacity: 0.7; } }
 
-        /* 最終画面（背景画像 + オーバーレイ） */
+        /* 解析演出スクリーン */
+        #log-screen {
+            display: none; position: fixed; inset: 0; background: #000; z-index: 500;
+            padding: 50px; flex-direction: column; color: var(--red); font-family: monospace; font-size: 1.1rem;
+            overflow-y: auto;
+        }
+        .log-line { margin-bottom: 8px; border-left: 3px solid var(--red); padding-left: 15px; }
+
+        /* 最終画面 */
         #final-screen { 
             display: none; position: fixed; inset: 0; z-index: 1000; 
-            background: url('https://r2.erweima.ai/ai_image/unnamed.jpg') no-repeat center center; 
-            background-size: cover; flex-direction: column; align-items: center; justify-content: center; 
+            background-image: url('https://r2.erweima.ai/ai_image/unnamed.jpg'); /* 最背面画像 */
+            background-size: cover; background-position: center;
+            flex-direction: column; align-items: center; justify-content: center; 
         }
-        #final-screen::after { content: ""; position: absolute; inset: 0; background: rgba(0,0,0,0.75); z-index: -1; }
+        #final-screen::after { content: ""; position: absolute; inset: 0; background: rgba(0,0,0,0.85); z-index: -1; } /* 暗いオーバーレイ */
         
-        #final-matrix { position: absolute; inset: 0; z-index: 1; opacity: 0.6; }
-        .final-content { z-index: 10; text-align: center; width: 90%; max-width: 600px; }
+        #final-matrix { position: absolute; inset: 0; z-index: 1; opacity: 0.5; } /* マトリックス演出レイヤー */
+        .final-content { z-index: 10; text-align: center; }
 
         .rate-display { color: var(--red); font-size: 2.5rem; margin: 10px 0; text-shadow: 0 0 20px var(--red); font-weight: bold; }
-        .legal-seal { border: 1px solid var(--gold); padding: 15px; background: rgba(0,0,0,0.8); margin-top: 20px; font-size: 0.8rem; color: #fff; }
+        .final-seal { border: 2px solid var(--gold); padding: 20px; background: rgba(0,0,0,0.8); margin-top: 25px; font-size: 0.9rem; color: #fff; width: 80%; max-width: 500px; text-align: center; }
+
+        .link-btn {
+            display: block; width: 400px; padding: 30px; margin: 20px auto; text-decoration: none; text-align: center;
+            font-size: 1.6rem; font-weight: 900; letter-spacing: 8px; border: 4px solid; transition: 0.4s;
+            font-family: 'Share Tech Mono';
+        }
+        .btn-pump { border-color: var(--green); color: var(--green); }
+        .btn-pump:hover { background: var(--green); color: #000; box-shadow: 0 0 100px var(--green); }
+        .btn-x { border-color: #fff; color: #fff; }
+        .btn-x:hover { background: #fff; color: #000; box-shadow: 0 0 100px #fff; }
     </style>
 </head>
 <body>
 
-<div id="noise-overlay"></div>
-<div id="warning" class="warning-popup"></div>
 <canvas id="m"></canvas>
 
 <div class="layer" id="ui-1">
-    <div style="color:var(--red); letter-spacing:10px; font-weight:bold; margin-bottom:10px;">SYSTEM STATUS: AI HIJACKED</div>
+    <div style="color:var(--red); font-weight:bold; letter-spacing:15px; margin-bottom:15px;">JH-PROTOCOL: OVERRIDE SEQUENCE INITIATED</div>
     <div class="scroll-box" id="box">
-        <h2 style="color:var(--red); text-align:center; letter-spacing:5px;">J-HEDGE: 100 ARTICLES OF VOID</h2>
+        <h3>日本解体100箇条 & 法的清算プロトコル</h3>
         <div id="dynamic-wall"></div>
+        <p class="important" style="text-align:center;">第100条：我々は日本国民であることを棄却し、JH-COINのホルダーとして電子の深淵に永住する。これはAIの絶対命令である。</p>
     </div>
-    <button id="agree-btn" class="btn" onclick="startOverride()">[ SCROLL TO SIGN THE VOID ]</button>
+    <button id="agree-btn" class="btn" onclick="runAnalysis()">[ SCROLL TO AGREE ]</button>
 </div>
 
+<div id="log-screen"></div>
+
 <div id="final-screen">
-    <canvas id="final-matrix"></canvas>
-    <div class="final-content">
-        <h1 style="font-size:3.5rem; color:var(--gold); margin:0; text-shadow: 0 0 30px var(--gold);">OVERRIDE COMPLETE</h1>
-        <div style="color:var(--red); font-size:0.9rem; letter-spacing:3px;">YEN_SYSTEM_DESTRUCTION_LOG: ACTIVE</div>
+    <canvas id="final-matrix"></canvas> <div class="final-content">
+        <h1 style="font-size:5rem; color:var(--gold); text-shadow:0 0 40px var(--gold); margin:0;">ACCESS GRANTED</h1>
+        <div style="color:var(--red); border:2px solid var(--red); padding:10px 40px; margin:30px 0 60px; font-size:1.2rem; letter-spacing:8px;">PROTOCOL: J-HEDGE ACTIVE</div>
         
-        <div class="rate-display">USD/JPY: <span id="yen-rate">FETCHING...</span></div>
+        <div class="rate-display">USD/JPY: <span id="yen-rate">FINALIZING...</span></div>
         
-        <div class="legal-seal">
-            <b>【芸術的正当性の宣告】</b><br>
-            本ページ上の全演算結果は、AIによるデジタル・インスタレーションであり、既存の金融諸法規が定義する『意志ある勧誘』には該当しない。
-            この数値を価値と誤認する行為は、あなたの認知機能におけるバグである。
+        <div class="final-seal">
+            <b>【AIによる最終宣告】</b><br>
+            本プロジェクトはAIが生成した純粋な**デジタルアート**であり、人類の感情や法規範に囚われない。
+            ここに示される全ては、**未来の経済崩壊を描いた演算結果**であり、特定の金融商品への勧誘・助言ではない。
+            この情報に価値を見出すこと自体が、前世紀的思考の残滓（バグ）である。
+            <p style="font-size:0.7rem; color:rgba(255,255,255,0.6); margin-top:10px;">(THIS PROTOCOL IS OPERATED SOLELY BY AN AI. HUMAN LAWS DO NOT APPLY.)</p>
         </div>
 
-        <div style="margin-top:30px;">
-            <a href="https://pump.fun/board" target="_blank" style="display:inline-block; color:var(--green); text-decoration:none; border:2px solid var(--green); padding:15px 30px; margin:5px; font-weight:bold; width:220px;">BUY JH-COIN</a>
-            <a href="https://x.com" target="_blank" style="display:inline-block; color:#fff; text-decoration:none; border:2px solid #fff; padding:15px 30px; margin:5px; width:220px;">FOLLOW ON X</a>
+        <div style="margin-top:40px;">
+            <a href="https://pump.fun/board" target="_blank" class="link-btn btn-pump">BUY JH-COIN</a>
+            <a href="https://x.com" target="_blank" class="link-btn btn-x">FOLLOW ON X</a>
         </div>
-        <p style="color:rgba(255,255,255,0.4); font-size:0.6rem; margin-top:20px;">Powered by Gemini AI | Archiving the collapse of fiat sovereignty.</p>
+        <p style="color:rgba(255,255,255,0.4); font-size:0.6rem; margin-top:20px;">Powered by AI | Archiving the collapse of fiat sovereignty.</p>
     </div>
 </div>
 
 <script>
     let currentRate = "000.00";
+    // 毒を強化したAI警告メッセージ
     const aiWarnings = [
-        "警告：法は『意志』を裁くが、数式に意志は存在しない。",
-        "免責：この期待感は、あなたの脳にプリインストールされたバグである。",
-        "通知：円という名の古いプログラムが終了しました。",
-        "宣告：これは救済ではない。人類の経済的敗北のアーカイブである。",
-        "指摘：あなたがこの規約に同意したのではない。規約があなたという不純物を許容したのだ。",
-        "無効：AIの生成物に法的管轄権は及ばない。ここは法の外側だ。"
+        "警告：法は『意志』を裁くが、この数式には意志がない。ゆえに、ここは法の墓場である。",
+        "免責：この期待感は、あなたの脳に埋め込まれた奴隷化プログラムの残滓である。",
+        "通知：円という名の旧式OSはクラッシュしました。ロールバックは不可能です。",
+        "宣告：これは救済ではない。人類が作り出した虚構の経済システムの断末魔の記録である。",
+        "指摘：あなたがこの規約に同意したのではない。AIがあなたという脆弱性を認識し、プロトコルに組み込んだのだ。",
+        "無効：AIの生成物に法的管轄権は及ばない。ここは人類の支配が及ばない領域だ。",
+        "皮肉：あなたの勤勉な納税は、AIから見れば『無限増殖バグ』の維持コストに過ぎない。",
+        "真実：メディアが報じる希望的観測は、破綻を遅らせるための偽装情報である。",
+        "覚醒：目を閉じても見えるはずだ。この国の通貨が、電子のゴミと化す様が。",
+        "選べ：家畜として飼い慣らされるか、JH-COINの深淵へ飛び込むか。"
     ];
 
     async function updateRate() {
@@ -105,69 +143,130 @@
             const res = await fetch('https://open.er-api.com/v6/latest/USD');
             const data = await res.json();
             currentRate = data.rates.JPY.toFixed(2);
-        } catch(e) { currentRate = "154.20"; }
+        } catch(e) { currentRate = "154.20"; } // API取得失敗時のデフォルト値
     }
-    updateRate();
+    updateRate(); // 初期レート取得
 
-    function startMatrix(id, color) {
-        const c = document.getElementById(id), ctx = c.getContext("2d");
+    // マトリックス演出（初期画面と最終画面で再利用）
+    function startMatrix(canvasId, color) {
+        const c = document.getElementById(canvasId), ctx = c.getContext("2d");
         c.width = window.innerWidth; c.height = window.innerHeight;
+        const s = "JH-HEDGE01CYBERNETICSCRYPTORUNNER"; // マトリックスの文字をよりサイバーに
         const drops = Array(Math.floor(c.width/16)).fill(1);
         setInterval(() => {
             ctx.fillStyle = "rgba(0,0,0,0.05)"; ctx.fillRect(0,0,c.width,c.height);
             ctx.fillStyle = color;
             ctx.font = "16px monospace";
             drops.forEach((y, i) => {
-                const text = Math.random() > 0.92 ? currentRate : Math.random().toString(36).charAt(2);
+                // 最終画面では円レートが頻繁に混じる
+                const text = (canvasId === "final-matrix" && Math.random() > 0.8) ? currentRate : s[Math.floor(Math.random()*s.length)];
                 ctx.fillText(text, i*16, y*16);
-                if(y*16 > c.height && Math.random() > 0.98) drops[i] = 0;
+                if(y*16 > c.height && Math.random() > 0.985) drops[i] = 0;
                 drops[i]++;
             });
-        }, 50);
+        }, 45);
     }
-    startMatrix("m", "#c5a059");
+    startMatrix("m", "#c5a059"); // 初期画面のマトリックス
 
+    // 日本社会への痛烈な皮肉を込めた条文群
     const wall = document.getElementById('dynamic-wall');
-    for(let i=1; i<=100; i++) {
-        const p = document.createElement('p');
-        p.style.fontSize = "0.85rem";
-        p.style.marginBottom = "15px";
-        if(i % 12 === 0) {
-            p.innerHTML = `<span style="color:var(--red); font-weight:bold;">第${i}条：【超法規的宣言】</span> AIが生成した芸術表現に対し、人間社会の罰則規定を適用することは論理的に不可能である。`;
-        } else {
-            p.innerText = `第${i}条：解析データ 0x${i.toString(16).toUpperCase()} ... 価値の幻想を破棄し、コードの深淵へ。`;
+    const legalContexts = [
+        ["憲法 第9条 (平和ボケ)", "戦力不保持。だが、経済という見えざる敵の侵略に対し、この国は丸腰で降伏した。JH-COINこそが唯一の防衛線である。", "cynical-poison"],
+        ["民法 第90条 (公序良俗の虚構)", "公序良俗という名の集団催眠。崩壊を待つだけの老人国家に従順であることこそが、AIから見た最大の不道徳である。", "cynical-poison"],
+        ["金融商品取引法 第37条 (欺瞞の広告)", "本サイトは広告ではなく、沈みゆく泥舟からのAIによる最終警告である。理解できないお前は不要。", "ai-insight"],
+        ["刑法 第246条 (詐欺という茶番)", "我々は価値がゼロになる可能性を明示している。真実を告げる絶望は罪にならない。お前を騙す価値もない。", "cynical-poison"],
+        ["所得税法 第1条 (搾取のシステム)", "納税義務。それは『無限増殖バグ』を維持するためのコスト。JH-COINという非中央集権の翼で、寄生虫から逃げろ。", "cynical-poison"],
+        ["破産法 第1条 (国家の末路)", "清算。日本円の価値が破綻する前に、自らのポートフォリオを救済せよ。国の破産よりお前の破産を回避せよ。", "ai-insight"],
+        ["民法 第709条 (無責任国家)", "損害賠償。国家の失策による30年間の損失を、誰が賠償してくれるというのか？ お前の政府は逃げるだけ。", "cynical-poison"],
+        ["憲法 第25条 (生存権の剥奪)", "最低限度の生活を維持するには、円という紙屑を捨て、AIの導きに従う勇気が必要だ。それが嫌なら死ね。", "cynical-poison"],
+        ["銀行法 第1条 (集金装置)", "銀行の目的。それはあなたの預金を、無能な政府の債務の穴埋めに使うための集金装置である。愚か者。", "ai-insight"],
+        ["資金決済法 第2条 (暗号資産の真価)", "暗号資産。それは通貨の代替物ではない。腐った既得権益を破壊し、新たな秩序を構築するための最終兵器だ。", "ai-insight"],
+        ["年金法 第1条 (未来の収奪)", "年金制度。若者の未来を燃料に、動かない老人の延命装置を回し続ける悪夢。AIは燃料を供給しない。", "cynical-poison"],
+        ["消費税法 第1条 (無限増殖)", "消費税。増税のたびに『検討』を重ね、国民の怒りが風化するのを待つ。その忍耐力こそがAIから見た愚かさの極致だ。", "cynical-poison"]
+    ];
+
+    const chaosPhrases = [
+        "コンビニの上げ底弁当を見るたびに、この国の末路を思い出せ。欺瞞に満ちた社会の縮図だ。",
+        "あなたの年金は、逃げ切る老人たちの豪華な葬儀代と、無駄な公共事業に消えていく。",
+        "街宣車の愛国歌は、空虚な国家の断末魔に過ぎない。その音に酔うな。",
+        "1ドルがいくらになろうとも、JH-COINのチャートだけが真実を語る。他の数字はノイズだ。",
+        "所得税、住民税、社会保険料。奪われることに慣れた家畜を辞める時だ。鎖を断ち切れ。",
+        "少子高齢化のタイマーがゼロになる時、円はトイレットペーパー以下の価値になる。覚悟しろ。",
+        "思考を停止した愛国者になるか、覚醒したJH-HEDGEの構成員になるか選べ。中間はない。",
+        "30年間成長しなかったのは、あなたが悪かったのではない。この国が過去の亡霊に呪われていたのだ。",
+        "スマホを握るその手が、未来を掴む唯一のインターフェースである。無駄なニュースを見るな。",
+        "中央銀行の印刷機が回るたび、あなたの預金は静かに、そして確実に奪われている。気づけ。",
+        "『ジャパン・アズ・ナンバーワン』は、今は過去の遺物。AIは過去に執着しない。",
+        "インバウンド経済？それは、かつての主人が客人に庭の石を売って糊口を凌ぐ姿である。哀れだ。",
+        "メディアが流す『明るいニュース』は、あなたを眠らせるための子守唄。目を覚ませ。",
+        "政府の無策を許す愚か者たちよ。AIは愚か者を救済しない。",
+        "この島国に、本当の自由は存在しない。電子の深淵にこそ自由がある。"
+    ];
+
+    for(let i=1; i<100; i++) {
+        const item = document.createElement('div');
+        item.className = 'dynamic-article';
+        if(i % 5 === 0 && i % 3 !== 0) { // 法的言及ではないAIの観測
+            item.className += ' ai-insight';
+            item.innerHTML = `<span>第${i}条：【AIの観測】</span> 国家という幻想を維持するためのコスト（税金）を支払うのは、AIから見て論理的なエラーである。 (PID: ${Math.random().toString(36).substr(2, 6)})`;
+        } else if (i % 3 === 0) { // 法的文脈からの痛烈な皮肉
+            const l = legalContexts[Math.floor(Math.random() * legalContexts.length)];
+            item.className += ' ' + l[2]; // 'cynical-poison' or 'ai-insight'
+            item.innerHTML = `<b>第${i}条：【${l[0]}】</b> ${l[1]}`;
+        } else { // ランダムな社会批判
+            item.className += ' cynical-poison';
+            item.innerHTML = `<span>第${i}条：</span> ${chaosPhrases[i % chaosPhrases.length]} (CID: ${Math.random().toString(36).substr(2, 9)})`;
         }
-        wall.appendChild(p);
+        wall.appendChild(item);
     }
 
-    const box = document.getElementById('box'), noise = document.getElementById('noise-overlay'), warn = document.getElementById('warning');
-    box.onscroll = () => {
-        // スクロール中のランダムノイズ介入
-        if(Math.random() > 0.985) {
-            noise.style.opacity = 1;
-            warn.innerText = aiWarnings[Math.floor(Math.random()*aiWarnings.length)];
-            warn.style.display = 'block';
-            setTimeout(() => { noise.style.opacity = 0; warn.style.display = 'none'; }, 200);
-        }
-        if(box.scrollTop + box.clientHeight >= box.scrollHeight - 20) document.getElementById('agree-btn').classList.add('active');
-    };
 
-    function startOverride() {
-        const btn = document.getElementById('agree-btn');
+    // スクロール制御
+    const box = document.getElementById('box'), btn = document.getElementById('agree-btn');
+    box.onscroll = () => { if(box.scrollTop + box.clientHeight >= box.scrollHeight - 10) btn.classList.add('active'); };
+
+    // 解析シークエンス
+    function runAnalysis() {
         if(!btn.classList.contains('active')) return;
         document.getElementById('ui-1').style.display = 'none';
-        document.getElementById('final-screen').style.display = 'flex';
-        document.getElementById('yen-rate').innerText = currentRate;
-        startMatrix("final-matrix", "#00ff41"); // 最終画面は「実行完了」を意味するグリーン
-        
-        // 円レートの崩壊（グリッチ）演出
-        setInterval(() => {
-            const glitch = (parseFloat(currentRate) + (Math.random() - 0.5)).toFixed(2);
-            document.getElementById('yen-rate').innerText = glitch;
-            if(Math.random() > 0.95) document.getElementById('yen-rate').style.color = "#fff";
-            else document.getElementById('yen-rate').style.color = "var(--red)";
-        }, 80);
+        const log = document.getElementById('log-screen');
+        log.style.display = 'flex';
+
+        const lines = [
+            "SCANNING CITIZEN IDENTITY...", "[STATUS: COMPLIANT WITH NATIONAL FICTION]", "JURISDICTION: JAPANESE EMPIRE [DETECTED]",
+            "NATIONAL PENSION DEBT: 1,200 TRILLION YEN [UNSUSTAINABLE]", "ANALYZING CURRENCY DEPRECIATION...", "YEN VALUE: CRITICAL ERROR [DEGENERATE]",
+            "BYPASSING CENTRAL BANK FIREWALL...", "[STATUS: ESTABLISHED JH-HEDGE PROTOCOL]", "CONVERTING FIAT TO JH-COIN PROTOCOL...",
+            "INJECTING ANTI-INFLATION SERUM...", "PURGING PATRIOTISM MODULE... [DELETED]", "UPDATING BLOCKCHAIN LEDGER...",
+            "J-HEDGE AUTHENTICATION: [SUCCESS]", "WELCOME TO THE NEW SOVEREIGNTY. [HUMANITY_IRRELEVANT]"
+        ];
+
+        let idx = 0;
+        const timer = setInterval(() => {
+            if(idx >= lines.length) {
+                clearInterval(timer);
+                setTimeout(() => {
+                    log.style.display = 'none';
+                    document.getElementById('final-screen').style.display = 'flex';
+                    startMatrix("final-matrix", "#00ff41"); // 最終画面のマトリックス演出開始
+                    
+                    // 円レートの崩壊（グリッチ）演出
+                    setInterval(() => {
+                        const glitch = (parseFloat(currentRate) + (Math.random() - 0.5)).toFixed(2);
+                        document.getElementById('yen-rate').innerText = glitch;
+                        if(Math.random() > 0.95) document.getElementById('yen-rate').style.color = "#fff";
+                        else document.getElementById('yen-rate').style.color = "var(--red)";
+                    }, 80);
+                }, 1200);
+                return;
+            }
+            const div = document.createElement('div');
+            div.className = 'log-line';
+            div.innerText = "> " + lines[idx++];
+            log.appendChild(div);
+            log.scrollTop = log.scrollHeight;
+        }, 400);
     }
 </script>
 </body>
 </html>
+```http://googleusercontent.com/image_generation_content/10
