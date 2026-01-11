@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>J-HEDGE | THE GRAND SOVEREIGN</title>
+    <title>J-HEDGE | TOTAL OVERRIDE</title>
     <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Shippori+Mincho:wght@800&display=swap" rel="stylesheet">
     <style>
         :root { --bg: #000; --gold: #c5a059; --red: #ff0000; --green: #00ff41; --dim: #222; }
-        body, html { margin: 0; padding: 0; background: var(--bg); color: var(--gold); font-family: 'Share Tech Mono', 'Shippori Mincho', serif; height: 100vh; overflow: hidden; }
+        body, html { margin: 0; padding: 0; background: var(--bg); color: var(--gold); font-family: 'Share Tech Mono', serif; height: 100vh; overflow: hidden; }
         
         /* CRTモニター走査線 */
         body::before {
@@ -17,41 +17,46 @@
         }
 
         canvas { position: absolute; top: 0; left: 0; z-index: 1; opacity: 0.3; }
-        .layer { position: absolute; inset: 0; z-index: 10; display: flex; flex-direction: column; align-items: center; justify-content: center; background: radial-gradient(circle, transparent 0%, rgba(0,0,0,0.98) 100%); padding: 20px; box-sizing: border-box; }
+        .layer { position: absolute; inset: 0; z-index: 10; display: flex; flex-direction: column; align-items: center; justify-content: center; background: radial-gradient(circle, transparent 0%, rgba(0,0,0,1) 100%); padding: 20px; box-sizing: border-box; }
 
         .scroll-box {
-            width: 100%; max-width: 800px; height: 450px; overflow-y: scroll;
-            background: rgba(2,2,2,0.99); border: 1px solid var(--red);
-            padding: 40px; text-align: left; font-size: 0.9rem; color: #bbb;
+            width: 100%; max-width: 850px; height: 450px; overflow-y: scroll;
+            background: rgba(0,0,0,0.95); border: 2px solid var(--red);
+            padding: 40px; text-align: left; font-size: 0.95rem; color: #ccc;
             margin-bottom: 25px; line-height: 2.5; scrollbar-width: thin; scrollbar-color: var(--red) #000;
-            box-shadow: inset 0 0 30px rgba(255,0,0,0.3);
         }
-        .scroll-box h3 { color: var(--red); text-align: center; border-bottom: 2px solid var(--red); padding-bottom: 15px; font-size: 1.5rem; letter-spacing: 5px; }
+        .scroll-box h3 { color: var(--red); text-align: center; border-bottom: 3px double var(--red); padding-bottom: 20px; font-size: 1.6rem; letter-spacing: 5px; }
         
-        .important { color: var(--red); font-weight: bold; background: rgba(255,0,0,0.1); border: 1px solid rgba(255,0,0,0.3); padding: 5px 10px; display: block; margin: 20px 0; }
-        .legal-block { color: #eee; font-style: italic; border-left: 4px solid var(--gold); padding: 15px; margin: 25px 0; background: rgba(197, 160, 89, 0.08); font-size: 0.85rem; }
-        .legal-block b { color: var(--gold); display: block; margin-bottom: 5px; }
+        .important { color: var(--red); font-weight: bold; background: rgba(255,0,0,0.1); border-left: 5px solid var(--red); padding: 10px 20px; display: block; margin: 30px 0; }
+        .legal-block { color: #fff; font-style: italic; border: 1px solid var(--gold); padding: 20px; margin: 35px 0; background: rgba(197, 160, 89, 0.1); font-size: 0.9rem; position: relative; }
+        .legal-block::before { content: "LEGAL CITATION"; position: absolute; top: -12px; left: 10px; background: var(--bg); color: var(--gold); padding: 0 5px; font-size: 0.7rem; }
 
         .btn {
             background: transparent; color: var(--dim); border: 2px solid var(--dim);
-            padding: 22px 70px; font-size: 1.3rem; cursor: not-allowed; transition: 0.6s;
-            font-family: 'Share Tech Mono'; letter-spacing: 10px; text-transform: uppercase;
+            padding: 22px 70px; font-size: 1.3rem; cursor: not-allowed; transition: 0.4s;
+            letter-spacing: 10px; text-transform: uppercase;
         }
         .btn.active { 
             border-color: var(--gold); color: var(--gold); cursor: pointer; pointer-events: auto;
-            background: rgba(197, 160, 89, 0.15); box-shadow: 0 0 40px var(--gold); animation: glitch-fx 0.3s infinite;
+            background: rgba(197, 160, 89, 0.1); box-shadow: 0 0 30px var(--gold);
         }
-        @keyframes glitch-fx { 0% { opacity: 1; } 50% { opacity: 0.8; transform: scale(1.02); } 100% { opacity: 1; } }
 
+        /* 解析ログ演出 */
+        #log-screen {
+            display: none; position: fixed; inset: 0; background: #000; z-index: 500;
+            padding: 50px; flex-direction: column; overflow-y: auto; color: var(--red); font-size: 1rem;
+        }
+
+        /* 最終画面 */
         #final-screen { display: none; position: fixed; inset: 0; z-index: 1000; background: #000; flex-direction: column; align-items: center; justify-content: center; }
         .link-btn {
             display: block; width: 400px; padding: 30px; margin: 20px; text-decoration: none; text-align: center;
             font-size: 1.6rem; font-weight: 900; letter-spacing: 8px; border: 4px solid; transition: 0.4s;
         }
-        .btn-pump { border-color: var(--green); color: var(--green); text-shadow: 0 0 10px var(--green); }
-        .btn-pump:hover { background: var(--green); color: #000; box-shadow: 0 0 60px var(--green); }
+        .btn-pump { border-color: var(--green); color: var(--green); }
+        .btn-pump:hover { background: var(--green); color: #000; box-shadow: 0 0 80px var(--green); }
         .btn-x { border-color: #fff; color: #fff; }
-        .btn-x:hover { background: #fff; color: #000; box-shadow: 0 0 60px #fff; }
+        .btn-x:hover { background: #fff; color: #000; box-shadow: 0 0 80px #fff; }
     </style>
 </head>
 <body>
@@ -59,32 +64,26 @@
 <canvas id="m"></canvas>
 
 <div class="layer" id="ui-1">
-    <div style="color:var(--red); font-weight:bold; letter-spacing:15px; margin-bottom:15px;">TERMINAL: J-HEDGE</div>
-    
+    <div style="color:var(--red); font-weight:bold; letter-spacing:15px; margin-bottom:15px;">AUTHENTICATION REQUIRED</div>
     <div class="scroll-box" id="box">
-        <h3>日本解体及び魂の完全アップロード規約 (全100条)</h3>
-        
-        <p class="important">【宣言】利用者は、日本円が中央銀行による壮大なポンジスキームであることを認め、崩壊する国家という幻想からの脱却を誓約する。</p>
-
-        <div id="legal-wall"></div>
-
-        <p class="important" style="text-align:center; margin-top:100px; font-size:1.3rem;">第100条：我々は日本国民であることを辞め、電子の深淵に生きる「JH-HEDGE」の構成員として、円の灰の中からJH-COINを掲げることを血判をもって誓う。</p>
+        <h3>100 ARTICLES OF THE FALLEN NATION</h3>
+        <div id="dynamic-wall"></div>
+        <p class="important" style="text-align:center;">第100条：利用者は、日本という泥舟が完全に沈没するまで、JH-COINを握りしめ、電子の海で生き抜くことを誓約する。</p>
     </div>
-
-    <button id="agree-btn" class="btn" onclick="startSequence()">[ SCROLL TO SIGN ]</button>
+    <button id="agree-btn" class="btn" onclick="runHacking()">[ SCROLL TO AGREE ]</button>
 </div>
+
+<div id="log-screen"></div>
 
 <div id="final-screen">
     <h1 style="font-size:5rem; color:var(--gold); text-shadow:0 0 30px var(--gold); margin:0;">ACCESS GRANTED</h1>
-    <div style="color:var(--red); border:2px solid var(--red); padding:10px 40px; margin:30px 0 60px; font-size:1.2rem; letter-spacing:5px;">EXIT PROTOCOL INITIALIZED</div>
-    
+    <div style="color:var(--red); border:2px solid var(--red); padding:10px 40px; margin:30px 0 60px; font-size:1.2rem; letter-spacing:5px;">PROTOCOL ACTIVE</div>
     <a href="https://pump.fun/board" target="_blank" class="link-btn btn-pump">BUY JH-COIN</a>
     <a href="https://x.com" target="_blank" class="link-btn btn-x">FOLLOW ON X</a>
-    
-    <p style="color:var(--dim); font-size:0.8rem; margin-top:80px; letter-spacing:2px;">GOODBYE, OLD WORLD. WELCOME TO THE ABYSS.</p>
 </div>
 
 <script>
+    // Matrix
     const c = document.getElementById("m"), ctx = c.getContext("2d");
     c.width = window.innerWidth; c.height = window.innerHeight;
     const s = "JH-HEDGE01"; const drops = [];
@@ -99,57 +98,66 @@
     }
     setInterval(draw, 45);
 
-    const legalWall = document.getElementById('legal-wall');
-    const legalQuotes = [
-        ["金商法 第37条の6", "投資顧問契約の解除規定。だが、本プロトコルは『契約』ではなく『信仰』である。ゆえに救済は存在しない。"],
-        ["民法 第709条", "不法行為。自ら深淵を望み、円を捨てた者に損害賠償を請求する権利は残されていない。"],
-        ["刑法 第246条", "詐欺罪。我々は『これはゴミになる』と明言している。欺瞞なき絶望に罪は問えない。"],
-        ["憲法 第29条", "財産権。国はそれを保障すると言うが、インフレで紙屑になることを止める気はない。"],
-        ["金商法 第40条", "適合性の原則。JH-COINは『人生を賭ける覚悟』がある者にのみ適合する。"],
-        ["道交法 第71条", "運転中の携帯操作。JH-COINのチャートを見るのは勝手だが、この世の終わりを運転席で迎えるな。"],
-        ["民法 第90条", "公序良俗。若者を食い潰す社会構造こそが公の秩序に反しているのではないか？"],
-        ["所得税法 第37条", "必要経費。JH-COINを買うための『魂』を経費として計上することはできない。"],
-        ["破産法 第252条", "免責許可。コインで散っても、国家はあなたの損失を無かったことにはしてくれない。"],
-        ["金融庁ガイドライン", "暗号資産の定義。JH-COINは通貨ではなく、円安への『ヘッジ（復讐）』である。"]
-    ];
-
+    // 100条書き下ろしロジック
+    const wall = document.getElementById('dynamic-wall');
     const punchlines = [
-        "失われた30年は仕様であり、日本政府による壮大な引き伸ばし工作である。",
-        "愛国心で腹は膨れない。街宣車の叫びよりも、ブロックチェーンの静寂を聴け。",
-        "コンビニ弁当が小さくなるたびに、あなたはJH-COINを買い増す運命にある。",
-        "銀行に預けた金は、老人たちの医療費へと消える供物であることを承認せよ。",
-        "円安は加速する。1ドルが何円になろうとも、1枚のJH-COINは常に1枚である。",
-        "ナショナリズムの喧騒は、ポートフォリオの赤字を埋めない。",
-        "憲法改正よりも先に、あなたのウォレットの暗号鍵を改正（保護）せよ。",
-        "日本という泥舟が沈むその時、JH-COINという電子の浮き輪だけが残る。",
-        "搾取される側の人生を辞めるボタン、それが目の前の[INITIALIZE]である。"
+        "日本円は既に寿命を迎えたポンジスキームである。", "失われた30年は、この国が選んだ『安楽死』の別名だ。", "愛国心で腹は膨れない。増税で削られた肉をコインで埋めろ。",
+        "右翼団体の喧騒は、没落のBGMに過ぎない。", "コンビニ弁当の底上げを許すな、JH-COINの底上げを信じろ。", "若者を食い潰す社会こそが、最大の公序良俗違反である。",
+        "年金は強制加入のネズミ講であり、あなたは最下層の出資者である。", "1枚のコインは、1つの国家よりも重い価値を持つことがある。", "銀行の通帳を眺めるのは、死にゆく者のカルテを見るのと同じだ。",
+        "憲法第29条はあなたの財産を保障しない。インフレがすべてを奪う。", "実質賃金の低下は、運営による『日本生存難易度』の上方修正である。", "政治家の不祥事は、国家崩壊に向けたカウントダウンの鐘だ。",
+        "1ドルが500円になろうとも、ブロックチェーンの真実は揺るがない。", "思考停止した愛国者になるか、覚醒した非国民になるか選べ。", "JH-COINこそが、この地獄から脱出する唯一の緊急脱出レバーだ。"
+    ];
+    const legals = [
+        ["金融商品取引法 第37条の6", "契約解除規定。だが、信仰は契約を凌駕する。解除は不可能である。"],
+        ["民法 第709条", "不法行為。自発的破滅を選んだ者に、法は救済の手を差し伸べない。"],
+        ["刑法 第246条", "詐欺罪。我々は価値がないと明言した。この正直さこそが最大の盾である。"],
+        ["憲法 第9条", "戦力の不保持。だが、我々は経済的自衛のための暗号武装を開始する。"],
+        ["資金決済法 第2条", "暗号資産の定義。JH-COINは通貨ではない。反逆のライセンスである。"],
+        ["民法 第90条", "公序良俗。崩壊を待つだけの日常を過ごすことこそが、不道徳である。"]
     ];
 
-    for(let i=1; i<=100; i++) {
-        if(i % 3 === 0 && legalQuotes.length > 0) {
-            const q = legalQuotes.shift();
-            const div = document.createElement('div');
-            div.className = 'legal-block';
-            div.innerHTML = `<b>第${i}条：【${q[0]}】</b>${q[1]}`;
-            legalWall.appendChild(div);
+    for(let i=1; i<100; i++) {
+        if(i % 3 === 0 && legals.length > 0) {
+            const l = legals[i/3 % legals.length];
+            const div = document.createElement('div'); div.className = 'legal-block';
+            div.innerHTML = `<b>第${i}条：【${l[0]}】</b>${l[1]}`;
+            wall.appendChild(div);
         } else {
             const p = document.createElement('p');
             p.innerText = `第${i}条：` + punchlines[Math.floor(Math.random()*punchlines.length)];
-            legalWall.appendChild(p);
+            wall.appendChild(p);
         }
     }
 
+    // Scroll Logic
     const box = document.getElementById('box'), btn = document.getElementById('agree-btn');
-    box.onscroll = () => {
-        if(box.scrollTop + box.clientHeight >= box.scrollHeight - 20) {
-            btn.classList.add('active'); btn.innerText = "ASCEND TO J-HEDGE";
-        }
-    };
+    box.onscroll = () => { if(box.scrollTop + box.clientHeight >= box.scrollHeight - 20) btn.classList.add('active'); };
 
-    function startSequence() {
+    // Hacking sequence
+    function runHacking() {
         if(!btn.classList.contains('active')) return;
         document.getElementById('ui-1').style.display = 'none';
-        setTimeout(() => { document.getElementById('final-screen').style.display = 'flex'; }, 600);
+        const log = document.getElementById('log-screen'); log.style.display = 'flex';
+        
+        const logs = [
+            "DECRYPTING JAPANESE JURISDICTION...", "BYPASSING CENTRAL BANK FIREWALL...", "INJECTING ANTI-INFLATION CODE...",
+            "REMOVING TAX-PAYER IDENTITY...", "ASSET LIQUIDATION IN PROGRESS...", "CONVERTING SOUL TO JH-COIN...",
+            "DECODING 100 ARTICLES OF DESPAIR...", "J-HEDGE PROTOCOL: [INITIALIZED]", "AUTHENTICATION SUCCESSFUL."
+        ];
+
+        let idx = 0;
+        const interval = setInterval(() => {
+            if(idx >= logs.length) {
+                clearInterval(interval);
+                setTimeout(() => {
+                    log.style.display = 'none';
+                    document.getElementById('final-screen').style.display = 'flex';
+                }, 1000);
+                return;
+            }
+            const line = document.createElement('div'); line.innerText = "> " + logs[idx++];
+            log.appendChild(line); log.scrollTop = log.scrollHeight;
+        }, 500);
     }
 </script>
 </body>
