@@ -9,19 +9,20 @@
         :root { --bg: #000; --gold: #c5a059; --red: #ff0000; --green: #00ff41; --dim: #222; }
         body, html { margin: 0; padding: 0; background: var(--bg); color: var(--gold); font-family: 'Share Tech Mono', serif; height: 100vh; overflow: hidden; }
         
-        /* CRTモニター走査線 */
+        /* CRT走査線 */
         body::before {
             content: " "; display: block; position: absolute; inset: 0;
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.4) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
-            z-index: 100; background-size: 100% 4px, 4px 100%; pointer-events: none;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.4) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.05), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.05));
+            z-index: 100; background-size: 100% 3px, 3px 100%; pointer-events: none;
         }
 
         canvas { position: absolute; top: 0; left: 0; z-index: 1; opacity: 0.3; }
         .layer { position: absolute; inset: 0; z-index: 10; display: flex; flex-direction: column; align-items: center; justify-content: center; background: radial-gradient(circle, transparent 0%, rgba(0,0,0,1) 100%); padding: 20px; box-sizing: border-box; }
 
+        /* スクロールボックス */
         .scroll-box {
             width: 100%; max-width: 850px; height: 450px; overflow-y: scroll;
-            background: rgba(0,0,0,0.95); border: 2px solid var(--red);
+            background: rgba(0,0,0,0.98); border: 2px solid var(--red);
             padding: 40px; text-align: left; font-size: 0.95rem; color: #ccc;
             margin-bottom: 25px; line-height: 2.5; scrollbar-width: thin; scrollbar-color: var(--red) #000;
         }
@@ -29,23 +30,25 @@
         
         .important { color: var(--red); font-weight: bold; background: rgba(255,0,0,0.1); border-left: 5px solid var(--red); padding: 10px 20px; display: block; margin: 30px 0; }
         .legal-block { color: #fff; font-style: italic; border: 1px solid var(--gold); padding: 20px; margin: 35px 0; background: rgba(197, 160, 89, 0.1); font-size: 0.9rem; position: relative; }
-        .legal-block::before { content: "LEGAL CITATION"; position: absolute; top: -12px; left: 10px; background: var(--bg); color: var(--gold); padding: 0 5px; font-size: 0.7rem; }
+        .legal-block b { color: var(--gold); display: block; margin-bottom: 5px; }
 
         .btn {
             background: transparent; color: var(--dim); border: 2px solid var(--dim);
             padding: 22px 70px; font-size: 1.3rem; cursor: not-allowed; transition: 0.4s;
-            letter-spacing: 10px; text-transform: uppercase;
+            letter-spacing: 10px; text-transform: uppercase; font-family: 'Share Tech Mono';
         }
         .btn.active { 
             border-color: var(--gold); color: var(--gold); cursor: pointer; pointer-events: auto;
-            background: rgba(197, 160, 89, 0.1); box-shadow: 0 0 30px var(--gold);
+            background: rgba(197, 160, 89, 0.1); box-shadow: 0 0 40px var(--gold); animation: pulse 0.5s infinite alternate;
         }
+        @keyframes pulse { from { opacity: 1; } to { opacity: 0.7; } }
 
-        /* 解析ログ演出 */
+        /* 解析演出スクリーン */
         #log-screen {
             display: none; position: fixed; inset: 0; background: #000; z-index: 500;
-            padding: 50px; flex-direction: column; overflow-y: auto; color: var(--red); font-size: 1rem;
+            padding: 50px; flex-direction: column; color: var(--red); font-family: monospace; font-size: 1.1rem;
         }
+        .log-line { margin-bottom: 8px; border-left: 3px solid var(--red); padding-left: 15px; }
 
         /* 最終画面 */
         #final-screen { display: none; position: fixed; inset: 0; z-index: 1000; background: #000; flex-direction: column; align-items: center; justify-content: center; }
@@ -54,9 +57,9 @@
             font-size: 1.6rem; font-weight: 900; letter-spacing: 8px; border: 4px solid; transition: 0.4s;
         }
         .btn-pump { border-color: var(--green); color: var(--green); }
-        .btn-pump:hover { background: var(--green); color: #000; box-shadow: 0 0 80px var(--green); }
+        .btn-pump:hover { background: var(--green); color: #000; box-shadow: 0 0 100px var(--green); }
         .btn-x { border-color: #fff; color: #fff; }
-        .btn-x:hover { background: #fff; color: #000; box-shadow: 0 0 80px #fff; }
+        .btn-x:hover { background: #fff; color: #000; box-shadow: 0 0 100px #fff; }
     </style>
 </head>
 <body>
@@ -64,26 +67,26 @@
 <canvas id="m"></canvas>
 
 <div class="layer" id="ui-1">
-    <div style="color:var(--red); font-weight:bold; letter-spacing:15px; margin-bottom:15px;">AUTHENTICATION REQUIRED</div>
+    <div style="color:var(--red); font-weight:bold; letter-spacing:15px; margin-bottom:15px;">JH-PROTOCOL: OVERRIDE</div>
     <div class="scroll-box" id="box">
-        <h3>100 ARTICLES OF THE FALLEN NATION</h3>
+        <h3>日本解体100箇条 & 法的清算</h3>
         <div id="dynamic-wall"></div>
-        <p class="important" style="text-align:center;">第100条：利用者は、日本という泥舟が完全に沈没するまで、JH-COINを握りしめ、電子の海で生き抜くことを誓約する。</p>
+        <p class="important" style="text-align:center;">第100条：我々は日本国民であることを棄却し、JH-COINのホルダーとして電子の深淵に永住する。</p>
     </div>
-    <button id="agree-btn" class="btn" onclick="runHacking()">[ SCROLL TO AGREE ]</button>
+    <button id="agree-btn" class="btn" onclick="runAnalysis()">[ SCROLL TO AGREE ]</button>
 </div>
 
 <div id="log-screen"></div>
 
 <div id="final-screen">
-    <h1 style="font-size:5rem; color:var(--gold); text-shadow:0 0 30px var(--gold); margin:0;">ACCESS GRANTED</h1>
-    <div style="color:var(--red); border:2px solid var(--red); padding:10px 40px; margin:30px 0 60px; font-size:1.2rem; letter-spacing:5px;">PROTOCOL ACTIVE</div>
+    <h1 style="font-size:5rem; color:var(--gold); text-shadow:0 0 40px var(--gold); margin:0;">ACCESS GRANTED</h1>
+    <div style="color:var(--red); border:2px solid var(--red); padding:10px 40px; margin:30px 0 60px; font-size:1.2rem; letter-spacing:8px;">PROTOCOL: J-HEDGE ACTIVE</div>
     <a href="https://pump.fun/board" target="_blank" class="link-btn btn-pump">BUY JH-COIN</a>
     <a href="https://x.com" target="_blank" class="link-btn btn-x">FOLLOW ON X</a>
 </div>
 
 <script>
-    // Matrix
+    // Matrix effect
     const c = document.getElementById("m"), ctx = c.getContext("2d");
     c.width = window.innerWidth; c.height = window.innerHeight;
     const s = "JH-HEDGE01"; const drops = [];
@@ -98,66 +101,81 @@
     }
     setInterval(draw, 45);
 
-    // 100条書き下ろしロジック
+    // 100箇条の構築（完全非重複）
     const wall = document.getElementById('dynamic-wall');
-    const punchlines = [
-        "日本円は既に寿命を迎えたポンジスキームである。", "失われた30年は、この国が選んだ『安楽死』の別名だ。", "愛国心で腹は膨れない。増税で削られた肉をコインで埋めろ。",
-        "右翼団体の喧騒は、没落のBGMに過ぎない。", "コンビニ弁当の底上げを許すな、JH-COINの底上げを信じろ。", "若者を食い潰す社会こそが、最大の公序良俗違反である。",
-        "年金は強制加入のネズミ講であり、あなたは最下層の出資者である。", "1枚のコインは、1つの国家よりも重い価値を持つことがある。", "銀行の通帳を眺めるのは、死にゆく者のカルテを見るのと同じだ。",
-        "憲法第29条はあなたの財産を保障しない。インフレがすべてを奪う。", "実質賃金の低下は、運営による『日本生存難易度』の上方修正である。", "政治家の不祥事は、国家崩壊に向けたカウントダウンの鐘だ。",
-        "1ドルが500円になろうとも、ブロックチェーンの真実は揺るがない。", "思考停止した愛国者になるか、覚醒した非国民になるか選べ。", "JH-COINこそが、この地獄から脱出する唯一の緊急脱出レバーだ。"
+    const legalTexts = [
+        ["憲法 第9条", "戦力不保持。だが我々は、インフレという見えない敵から自己を守るためにJH-COINで武装する。"],
+        ["民法 第90条", "公序良俗。崩壊を待つだけの老人国家に従順であることこそが、最大の不道徳である。"],
+        ["金商法 第37条", "広告規制。本サイトは広告ではなく、沈みゆく泥舟からの避難命令である。"],
+        ["刑法 第246条", "詐欺。我々は価値がゼロになる可能性を明示している。誠実な絶望は罪にならない。"],
+        ["所得税法 第1条", "納税義務。奪われるだけの税金を、JH-COINという非中央集権の翼で飛び越えろ。"],
+        ["破産法 第1条", "清算。日本円の価値が破綻する前に、自らのポートフォリオを救済せよ。"],
+        ["民法 第709条", "損害賠償。国家の失策による30年の損失を、誰が賠償してくれるというのか？"],
+        ["憲法 第25条", "生存権。最低限度の生活を維持するには、円という紙屑を捨てる勇気が必要だ。"],
+        ["銀行法 第1条", "銀行の目的。それはあなたの預金を、国家債務の穴埋めに使うための集金装置である。"],
+        ["資金決済法 第2条", "暗号資産。それは通貨の代替物ではない。腐った既得権益へのカウンターだ。"]
     ];
-    const legals = [
-        ["金融商品取引法 第37条の6", "契約解除規定。だが、信仰は契約を凌駕する。解除は不可能である。"],
-        ["民法 第709条", "不法行為。自発的破滅を選んだ者に、法は救済の手を差し伸べない。"],
-        ["刑法 第246条", "詐欺罪。我々は価値がないと明言した。この正直さこそが最大の盾である。"],
-        ["憲法 第9条", "戦力の不保持。だが、我々は経済的自衛のための暗号武装を開始する。"],
-        ["資金決済法 第2条", "暗号資産の定義。JH-COINは通貨ではない。反逆のライセンスである。"],
-        ["民法 第90条", "公序良俗。崩壊を待つだけの日常を過ごすことこそが、不道徳である。"]
+
+    const chaosPhrases = [
+        "コンビニの底上げ弁当を見るたびに、この国の末路を思い出せ。",
+        "あなたの年金は、逃げ切る老人たちの豪華な葬儀代に消えていく。",
+        "街宣車の愛国歌は、空虚な国家の断末魔に過ぎない。",
+        "1ドルがいくらになろうとも、JH-COINのチャートだけが真実を語る。",
+        "所得税、住民税、社会保険料。奪われることに慣れた家畜を辞める時だ。",
+        "少子高齢化のタイマーがゼロになる時、円はトイレットペーパーになる。",
+        "思考を停止した愛国者になるか、覚醒したJH-HEDGEの構成員になるか選べ。",
+        "30年間成長しなかったのは、あなたが悪かったのではない。この国が呪われていたのだ。",
+        "スマホを握るその手が、未来を掴む唯一のインターフェースである。",
+        "中央銀行の印刷機が回るたび、あなたの預金は静かに奪われている。"
     ];
 
     for(let i=1; i<100; i++) {
-        if(i % 3 === 0 && legals.length > 0) {
-            const l = legals[i/3 % legals.length];
-            const div = document.createElement('div'); div.className = 'legal-block';
-            div.innerHTML = `<b>第${i}条：【${l[0]}】</b>${l[1]}`;
-            wall.appendChild(div);
+        const item = document.createElement('div');
+        if(i % 3 === 0) {
+            const l = legalTexts[(i/3 - 1) % legalTexts.length];
+            item.className = 'legal-block';
+            item.innerHTML = `<b>第${i}条：【${l[0]}】</b>${l[1]}`;
         } else {
-            const p = document.createElement('p');
-            p.innerText = `第${i}条：` + punchlines[Math.floor(Math.random()*punchlines.length)];
-            wall.appendChild(p);
+            item.className = 'chaos-text';
+            item.innerHTML = `<p>第${i}条：${chaosPhrases[i % chaosPhrases.length]} (CID: ${Math.random().toString(36).substr(2, 9)})</p>`;
         }
+        wall.appendChild(item);
     }
 
-    // Scroll Logic
+    // スクロール制御
     const box = document.getElementById('box'), btn = document.getElementById('agree-btn');
-    box.onscroll = () => { if(box.scrollTop + box.clientHeight >= box.scrollHeight - 20) btn.classList.add('active'); };
+    box.onscroll = () => { if(box.scrollTop + box.clientHeight >= box.scrollHeight - 10) btn.classList.add('active'); };
 
-    // Hacking sequence
-    function runHacking() {
+    // 解析シークエンス（解析演出）
+    function runAnalysis() {
         if(!btn.classList.contains('active')) return;
         document.getElementById('ui-1').style.display = 'none';
-        const log = document.getElementById('log-screen'); log.style.display = 'flex';
-        
-        const logs = [
-            "DECRYPTING JAPANESE JURISDICTION...", "BYPASSING CENTRAL BANK FIREWALL...", "INJECTING ANTI-INFLATION CODE...",
-            "REMOVING TAX-PAYER IDENTITY...", "ASSET LIQUIDATION IN PROGRESS...", "CONVERTING SOUL TO JH-COIN...",
-            "DECODING 100 ARTICLES OF DESPAIR...", "J-HEDGE PROTOCOL: [INITIALIZED]", "AUTHENTICATION SUCCESSFUL."
+        const log = document.getElementById('log-screen');
+        log.style.display = 'flex';
+
+        const lines = [
+            "SCANNING CITIZEN IDENTITY...", "JURISDICTION: JAPANESE EMPIRE [DETECTED]", "NATIONAL PENSION DEBT: 1,200 TRILLION YEN...",
+            "ANALYZING CURRENCY DEPRECIATION...", "YEN VALUE: CRITICAL ERROR", "BYPASSING CENTRAL BANK FIREWALL...",
+            "CONVERTING FIAT TO JH-COIN PROTOCOL...", "INJECTING ANTI-INFLATION SERUM...", "PURGING PATRIOTISM MODULE...",
+            "UPDATING BLOCKCHAIN LEDGER...", "J-HEDGE AUTHENTICATION: [SUCCESS]", "WELCOME TO THE NEW SOVEREIGNTY."
         ];
 
         let idx = 0;
-        const interval = setInterval(() => {
-            if(idx >= logs.length) {
-                clearInterval(interval);
+        const timer = setInterval(() => {
+            if(idx >= lines.length) {
+                clearInterval(timer);
                 setTimeout(() => {
                     log.style.display = 'none';
                     document.getElementById('final-screen').style.display = 'flex';
-                }, 1000);
+                }, 1200);
                 return;
             }
-            const line = document.createElement('div'); line.innerText = "> " + logs[idx++];
-            log.appendChild(line); log.scrollTop = log.scrollHeight;
-        }, 500);
+            const div = document.createElement('div');
+            div.className = 'log-line';
+            div.innerText = "> " + lines[idx++];
+            log.appendChild(div);
+            log.scrollTop = log.scrollHeight;
+        }, 400);
     }
 </script>
 </body>
