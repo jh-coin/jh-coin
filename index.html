@@ -4,200 +4,54 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>J-HEDGE | TOTAL AI OVERRIDE</title>
-    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Shippori+Mincho:wght@800&display=swap" rel="stylesheet">
     <style>
         :root { --bg: #000; --gold: #c5a059; --red: #ff0000; --green: #00ff41; --dim: #222; }
+        body, html { margin: 0; padding: 0; background: var(--bg); color: var(--gold); font-family: 'Share Tech Mono', monospace; height: 100%; overflow: hidden; }
         
-        /* 画面全体の基本設定 */
-        body, html { 
-            margin: 0; padding: 0; background: var(--bg); color: var(--gold); 
-            font-family: 'Share Tech Mono', monospace; height: 100%; width: 100%;
-            overflow: hidden; position: fixed; /* スクロール暴発防止 */
-        }
-
-        /* 背景のマトリックス・キャンバス */
-        canvas { position: absolute; top: 0; left: 0; z-index: 1; opacity: 0.3; }
-
-        /* CRT走査線エフェクト */
+        /* CRT走査線（演出維持） */
         body::before {
             content: " "; display: block; position: absolute; inset: 0;
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.4) 50%), 
-                        linear-gradient(90deg, rgba(255, 0, 0, 0.05), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.05));
-            z-index: 200; background-size: 100% 3px, 3px 100%; pointer-events: none;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.4) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.05), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.05));
+            z-index: 100; background-size: 100% 3px, 3px 100%; pointer-events: none;
         }
 
-        /* 各セクションの共通設定 */
-        .screen-layer {
-            position: absolute; inset: 0; z-index: 100;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            padding: 20px; box-sizing: border-box; background: rgba(0,0,0,0.8);
+        canvas { position: absolute; top: 0; left: 0; z-index: 1; opacity: 0.3; }
+
+        /* レイヤー基本設定：スマホで崩れないよう修正 */
+        .layer { 
+            position: absolute; inset: 0; z-index: 10; display: flex; flex-direction: column; align-items: center; justify-content: center; 
+            background: radial-gradient(circle, transparent 0%, rgba(0,0,0,1) 100%); padding: 15px; box-sizing: border-box; 
         }
 
-        /* 同意画面 (初期状態で表示) */
-        #ui-1 { display: flex; }
-
-        /* 規約スクロールボックス */
+        /* スクロールボックス：高さを可変（50vh）にしてボタンを見やすく */
         .scroll-box {
-            width: 100%; max-width: 800px; height: 50vh; 
-            overflow-y: scroll; background: rgba(0,0,0,0.9); border: 2px solid var(--red);
-            padding: 20px; margin-bottom: 20px; scrollbar-width: thin; scrollbar-color: var(--red) #000;
+            width: 100%; max-width: 850px; height: 50vh; overflow-y: scroll;
+            background: rgba(0,0,0,0.98); border: 2px solid var(--red);
+            padding: 20px; text-align: left; font-size: 0.95rem; color: #ccc;
+            margin-bottom: 20px; line-height: 2.2; scrollbar-width: thin; scrollbar-color: var(--red) #000;
         }
-        .scroll-box h3 { color: var(--red); text-align: center; border-bottom: 2px solid var(--red); padding-bottom: 10px; font-size: 1.2rem; }
-        .dynamic-article { margin-bottom: 15px; border-left: 2px solid var(--dim); padding-left: 10px; font-size: 0.85rem; color: #ccc; }
-        .dynamic-article b { color: var(--red); }
+        .scroll-box h3 { color: var(--red); text-align: center; border-bottom: 3px double var(--red); padding-bottom: 10px; font-size: 1.4rem; letter-spacing: 5px; }
+        
+        /* 演出用クラス：すべて維持 */
+        .important { color: var(--red); font-weight: bold; background: rgba(255,0,0,0.1); border-left: 5px solid var(--red); padding: 10px; display: block; margin: 25px 0; }
+        .dynamic-article { margin-bottom: 20px; padding-left: 15px; border-left: 2px solid var(--dim); }
+        .dynamic-article.cynical-poison { border-left-color: var(--red); color: var(--red); font-weight: bold; }
+        .dynamic-article.ai-insight { border-left-color: var(--gold); color: var(--gold); font-style: italic; }
 
-        /* 同意ボタン */
+        /* 同意ボタン：幅をレスポンシブ化 */
         .btn {
             background: transparent; color: var(--dim); border: 2px solid var(--dim);
-            padding: 15px 40px; font-size: 1rem; cursor: not-allowed; transition: 0.4s;
-            letter-spacing: 5px; width: 100%; max-width: 350px;
+            padding: 18px 0; font-size: 1.1rem; cursor: not-allowed; transition: 0.4s;
+            letter-spacing: 5px; text-transform: uppercase; width: 100%; max-width: 400px;
         }
         .btn.active { 
-            border-color: var(--gold); color: var(--gold); cursor: pointer; 
-            background: rgba(197, 160, 89, 0.2); box-shadow: 0 0 20px var(--gold);
+            border-color: var(--gold); color: var(--gold); cursor: pointer; pointer-events: auto;
+            background: rgba(197, 160, 89, 0.1); box-shadow: 0 0 30px var(--gold); animation: pulse 0.5s infinite alternate;
         }
+        @keyframes pulse { from { opacity: 1; } to { opacity: 0.7; } }
 
-        /* 解析ログ画面 (初期は非表示) */
-        #log-screen { display: none; background: #000; color: var(--red); overflow-y: auto; align-items: flex-start; justify-content: flex-start; font-size: 0.9rem; }
-        .log-line { margin-bottom: 5px; border-left: 2px solid var(--red); padding-left: 10px; }
-
-        /* 最終画面 (初期は非表示) */
-        #final-screen { 
-            display: none; overflow-y: auto; justify-content: flex-start; 
-            background-image: url('https://r2.erweima.ai/ai_image/unnamed.jpg');
-            background-size: cover; background-position: center;
-        }
-        #final-screen::after { content: ""; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: -1; }
-        .final-content { z-index: 10; text-align: center; width: 100%; max-width: 500px; padding: 40px 0; margin: auto; }
-
-        .main-title { font-size: 3rem; color: var(--gold); text-shadow: 0 0 20px var(--gold); margin: 0; }
-        .rate-display { color: var(--red); font-size: 1.8rem; margin: 20px 0; font-weight: bold; }
-        .final-seal { border: 1px solid var(--gold); padding: 15px; font-size: 0.75rem; color: #fff; background: rgba(0,0,0,0.8); margin-bottom: 30px; }
-
-        /* リンクボタン */
-        .link-btn {
-            display: block; padding: 18px; margin: 10px auto; text-decoration: none; font-weight: bold;
-            font-size: 1.1rem; border: 3px solid; transition: 0.3s;
-        }
-        .btn-pump { border-color: var(--green); color: var(--green); }
-        .btn-pump:hover { background: var(--green); color: #000; }
-        .btn-x { border-color: #fff; color: #fff; }
-        .btn-x:hover { background: #fff; color: #000; }
-
-        @media (max-width: 480px) {
-            .main-title { font-size: 2.2rem; }
-            .scroll-box { height: 45vh; }
-        }
-    </style>
-</head>
-<body>
-
-<canvas id="m"></canvas>
-
-<div class="screen-layer" id="ui-1">
-    <div style="color:var(--red); font-size:0.7rem; letter-spacing:3px; margin-bottom:10px;">JH-PROTOCOL: INITIALIZING...</div>
-    <div class="scroll-box" id="box">
-        <h3>日本解体100箇条 & 法的清算規約</h3>
-        <div id="dynamic-wall"></div>
-    </div>
-    <button id="agree-btn" class="btn" onclick="runAnalysis()">[ SCROLL TO AGREE ]</button>
-</div>
-
-<div class="screen-layer" id="log-screen"></div>
-
-<div class="screen-layer" id="final-screen">
-    <div class="final-content">
-        <h1 class="main-title">ACCESS<br>GRANTED</h1>
-        <div class="rate-display">USD/JPY: <span id="yen-rate">FETCHING...</span></div>
-        
-        <div class="final-seal">
-            <b>【AI FINAL NOTICE】</b><br>
-            本プロジェクトはAIが生成したデジタルアートです。
-            全ての演算結果はフィクションであり、実在の金融商品とは無関係です。
-            この画面を閉じ、現実に戻るか、深淵に進むかは自由です。
-        </div>
-
-        <a href="https://pump.fun/board" target="_blank" class="link-btn btn-pump">BUY JH-COIN</a>
-        <a href="https://x.com" target="_blank" class="link-btn btn-x">FOLLOW ON X</a>
-    </div>
-</div>
-
-<script>
-    const box = document.getElementById('box'), btn = document.getElementById('agree-btn');
-    const wall = document.getElementById('dynamic-wall');
-    let currentRate = "154.20";
-
-    // 規約の自動生成
-    const phrases = ["円は紙屑と化す。","納税はバグへの課金。","思考停止は最大の罪。","AIに国境はない。","救済はデジタルの中に。"];
-    for(let i=1; i<=100; i++) {
-        const d = document.createElement('div');
-        d.className = 'dynamic-article';
-        d.innerHTML = `<b>第${i}条:</b> ${phrases[i % phrases.length]} (UID:${Math.random().toString(36).substr(2,5)})`;
-        wall.appendChild(d);
-    }
-
-    // スクロール検知
-    box.addEventListener('scroll', () => {
-        if(box.scrollTop + box.clientHeight >= box.scrollHeight - 20) {
-            btn.classList.add('active');
-            btn.innerText = "[ I ACCEPT THE COLLAPSE ]";
-        }
-    });
-
-    // 解析アニメーション
-    function runAnalysis() {
-        if(!btn.classList.contains('active')) return;
-        document.getElementById('ui-1').style.display = 'none';
-        const log = document.getElementById('log-screen');
-        log.style.display = 'flex';
-
-        const lines = ["CONNECTING...","BYPASSING FIREWALL...","DELETING FIAT_SYSTEM...","JH-COIN AUTHENTICATED.","WELCOME TO THE VOID."];
-        let i = 0;
-        const interval = setInterval(() => {
-            if(i >= lines.length) {
-                clearInterval(interval);
-                setTimeout(showFinal, 800);
-                return;
-            }
-            const l = document.createElement('div');
-            l.className = 'log-line';
-            l.innerText = "> " + lines[i++];
-            log.appendChild(l);
-        }, 400);
-    }
-
-    function showFinal() {
-        document.getElementById('log-screen').style.display = 'none';
-        document.getElementById('final-screen').style.display = 'flex';
-        updateRate();
-    }
-
-    async function updateRate() {
-        try {
-            const res = await fetch('https://open.er-api.com/v6/latest/USD');
-            const data = await res.json();
-            currentRate = data.rates.JPY.toFixed(2);
-        } catch(e) {}
-        setInterval(() => {
-            const g = (parseFloat(currentRate) + (Math.random()-0.5)).toFixed(2);
-            document.getElementById('yen-rate').innerText = g;
-        }, 100);
-    }
-
-    // 背景マトリックス
-    const c = document.getElementById("m"), ctx = c.getContext("2d");
-    c.width = window.innerWidth; c.height = window.innerHeight;
-    const drops = Array(Math.floor(c.width/16)).fill(1);
-    function draw() {
-        ctx.fillStyle = "rgba(0,0,0,0.05)"; ctx.fillRect(0,0,c.width,c.height);
-        ctx.fillStyle = "#c5a059"; ctx.font = "15px monospace";
-        drops.forEach((y, i) => {
-            ctx.fillText(String.fromCharCode(0x30A0 + Math.random() * 96), i*16, y*16);
-            if(y*16 > c.height && Math.random() > 0.975) drops[i] = 0;
-            drops[i]++;
-        });
-    }
-    setInterval(draw, 50);
-</script>
-</body>
-</html>
+        /* 解析ログ画面 */
+        #log-screen {
+            display: none; position: fixed; inset: 0; background: #000; z-index: 500;
+            padding: 30px; flex-direction: column; color: var(--red);
