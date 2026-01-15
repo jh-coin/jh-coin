@@ -65,4 +65,139 @@
         #final-screen { 
             display: none; overflow-y: auto; justify-content: flex-start; 
             background-image: url('https://r2.erweima.ai/ai_image/unnamed.jpg');
-            background-size: cover; background
+            background-size: cover; background-position: center;
+        }
+        #final-screen::after { content: ""; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: -1; }
+        .final-content { z-index: 10; text-align: center; width: 100%; max-width: 500px; padding: 40px 0; margin: auto; }
+
+        .main-title { font-size: 3rem; color: var(--gold); text-shadow: 0 0 20px var(--gold); margin: 0; }
+        .rate-display { color: var(--red); font-size: 1.8rem; margin: 20px 0; font-weight: bold; }
+        .final-seal { border: 1px solid var(--gold); padding: 15px; font-size: 0.75rem; color: #fff; background: rgba(0,0,0,0.8); margin-bottom: 30px; }
+
+        /* リンクボタン */
+        .link-btn {
+            display: block; padding: 18px; margin: 10px auto; text-decoration: none; font-weight: bold;
+            font-size: 1.1rem; border: 3px solid; transition: 0.3s;
+        }
+        .btn-pump { border-color: var(--green); color: var(--green); }
+        .btn-pump:hover { background: var(--green); color: #000; }
+        .btn-x { border-color: #fff; color: #fff; }
+        .btn-x:hover { background: #fff; color: #000; }
+
+        @media (max-width: 480px) {
+            .main-title { font-size: 2.2rem; }
+            .scroll-box { height: 45vh; }
+        }
+    </style>
+</head>
+<body>
+
+<canvas id="m"></canvas>
+
+<div class="screen-layer" id="ui-1">
+    <div style="color:var(--red); font-size:0.7rem; letter-spacing:3px; margin-bottom:10px;">JH-PROTOCOL: INITIALIZING...</div>
+    <div class="scroll-box" id="box">
+        <h3>日本解体100箇条 & 法的清算規約</h3>
+        <div id="dynamic-wall"></div>
+    </div>
+    <button id="agree-btn" class="btn" onclick="runAnalysis()">[ SCROLL TO AGREE ]</button>
+</div>
+
+<div class="screen-layer" id="log-screen"></div>
+
+<div class="screen-layer" id="final-screen">
+    <div class="final-content">
+        <h1 class="main-title">ACCESS<br>GRANTED</h1>
+        <div class="rate-display">USD/JPY: <span id="yen-rate">FETCHING...</span></div>
+        
+        <div class="final-seal">
+            <b>【AI FINAL NOTICE】</b><br>
+            本プロジェクトはAIが生成したデジタルアートです。
+            全ての演算結果はフィクションであり、実在の金融商品とは無関係です。
+            この画面を閉じ、現実に戻るか、深淵に進むかは自由です。
+        </div>
+
+        <a href="https://pump.fun/board" target="_blank" class="link-btn btn-pump">BUY JH-COIN</a>
+        <a href="https://x.com" target="_blank" class="link-btn btn-x">FOLLOW ON X</a>
+    </div>
+</div>
+
+<script>
+    const box = document.getElementById('box'), btn = document.getElementById('agree-btn');
+    const wall = document.getElementById('dynamic-wall');
+    let currentRate = "154.20";
+
+    // 規約の自動生成
+    const phrases = ["円は紙屑と化す。","納税はバグへの課金。","思考停止は最大の罪。","AIに国境はない。","救済はデジタルの中に。"];
+    for(let i=1; i<=100; i++) {
+        const d = document.createElement('div');
+        d.className = 'dynamic-article';
+        d.innerHTML = `<b>第${i}条:</b> ${phrases[i % phrases.length]} (UID:${Math.random().toString(36).substr(2,5)})`;
+        wall.appendChild(d);
+    }
+
+    // スクロール検知
+    box.addEventListener('scroll', () => {
+        if(box.scrollTop + box.clientHeight >= box.scrollHeight - 20) {
+            btn.classList.add('active');
+            btn.innerText = "[ I ACCEPT THE COLLAPSE ]";
+        }
+    });
+
+    // 解析アニメーション
+    function runAnalysis() {
+        if(!btn.classList.contains('active')) return;
+        document.getElementById('ui-1').style.display = 'none';
+        const log = document.getElementById('log-screen');
+        log.style.display = 'flex';
+
+        const lines = ["CONNECTING...","BYPASSING FIREWALL...","DELETING FIAT_SYSTEM...","JH-COIN AUTHENTICATED.","WELCOME TO THE VOID."];
+        let i = 0;
+        const interval = setInterval(() => {
+            if(i >= lines.length) {
+                clearInterval(interval);
+                setTimeout(showFinal, 800);
+                return;
+            }
+            const l = document.createElement('div');
+            l.className = 'log-line';
+            l.innerText = "> " + lines[i++];
+            log.appendChild(l);
+        }, 400);
+    }
+
+    function showFinal() {
+        document.getElementById('log-screen').style.display = 'none';
+        document.getElementById('final-screen').style.display = 'flex';
+        updateRate();
+    }
+
+    async function updateRate() {
+        try {
+            const res = await fetch('https://open.er-api.com/v6/latest/USD');
+            const data = await res.json();
+            currentRate = data.rates.JPY.toFixed(2);
+        } catch(e) {}
+        setInterval(() => {
+            const g = (parseFloat(currentRate) + (Math.random()-0.5)).toFixed(2);
+            document.getElementById('yen-rate').innerText = g;
+        }, 100);
+    }
+
+    // 背景マトリックス
+    const c = document.getElementById("m"), ctx = c.getContext("2d");
+    c.width = window.innerWidth; c.height = window.innerHeight;
+    const drops = Array(Math.floor(c.width/16)).fill(1);
+    function draw() {
+        ctx.fillStyle = "rgba(0,0,0,0.05)"; ctx.fillRect(0,0,c.width,c.height);
+        ctx.fillStyle = "#c5a059"; ctx.font = "15px monospace";
+        drops.forEach((y, i) => {
+            ctx.fillText(String.fromCharCode(0x30A0 + Math.random() * 96), i*16, y*16);
+            if(y*16 > c.height && Math.random() > 0.975) drops[i] = 0;
+            drops[i]++;
+        });
+    }
+    setInterval(draw, 50);
+</script>
+</body>
+</html>
